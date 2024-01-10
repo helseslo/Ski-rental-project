@@ -1,4 +1,4 @@
 # Ski-rental-project
-Ongoing project for databases course.
+An ongoing project for a databases course.
 
 We are creating a simple database in postgreSQL and a plain GUI in R Shiny.
