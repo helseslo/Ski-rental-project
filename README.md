@@ -1,2 +1,2 @@
 # Ski-rental-project
-Ou project for databases course
+Our project for databases course
