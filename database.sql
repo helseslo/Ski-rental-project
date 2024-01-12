@@ -64,18 +64,19 @@ CREATE TABLE klienci (
     nazwisko VARCHAR(50) NOT NULL,
     nr_telefonu VARCHAR(50) UNIQUE NOT NULL,
     nr_dowodu VARCHAR(50) UNIQUE NOT NULL,
-    PESEL VARCHAR(50) UNIQUE NOT NULL
+    PESEL VARCHAR(50) UNIQUE NOT NULL,
+    czarna_lista BOOLEAN DEFAULT (FALSE) NOT NULL
 );
 
 
 CREATE TABLE rejestr(
     id_wypozyczenia INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    /*Czy tu na pewno chcemy przy delete usuwać wszystko? Czy to mają być aktualne wypoyczenia,
-    czy historia tez?*/
-    id_klienta INTEGER REFERENCES klienci(id_klienta) ON DELETE CASCADE ON UPDATE CASCADE,
-    id_sprzetu INTEGER REFERENCES sprzet(id_sprzetu) ON DELETE CASCADE ON UPDATE CASCADE,
+    id_klienta INTEGER REFERENCES klienci(id_klienta) ON UPDATE CASCADE,
+    id_sprzetu INTEGER REFERENCES sprzet(id_sprzetu) ON UPDATE CASCADE,
     data_wypozyczenia DATE NOT NULL,
-    data_zwrotu DATE NOT NULL CHECK (data_zwrotu > data_wypozyczenia)
-    /*Co, jeśli ktoś nie odda sprzętu w terminie? Dodatkowe atrybuty itd. Moze czarna lista, blok albo coś*/
+    data_zwrotu DATE NOT NULL CHECK (data_zwrotu > data_wypozyczenia),
+    przedluzenie INTEGER DEFAULT (0) CHECK (przedluzenie >= 0) NOT NULL,
+    calkowity_koszt INTEGER CHECK (calkowity_koszt >= 0) NOT NULL,
+    czy_aktualne BOOLEAN DEFAULT (FALSE) NOT NULL
 );
 
