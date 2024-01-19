@@ -73,9 +73,9 @@ CREATE TABLE rejestr(
     id_wypozyczenia INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_klienta INTEGER REFERENCES klienci(id_klienta) ON UPDATE CASCADE,
     id_sprzetu INTEGER REFERENCES sprzet(id_sprzetu) ON UPDATE CASCADE,
-    data_wypozyczenia DATE NOT NULL,
+    data_wypozyczenia DATE DEFAULT(CURRENT_DATE) NOT NULL,
     data_zwrotu DATE NOT NULL CHECK (data_zwrotu > data_wypozyczenia),
-    przedluzenie INTEGER DEFAULT (0) CHECK (przedluzenie >= 0) NOT NULL,
+    maksymalne_przedluzenie DATE DEFAULT(3000-01-01) NOT NULL,
     calkowity_koszt INTEGER CHECK (calkowity_koszt >= 0) NOT NULL,
     czy_aktualne BOOLEAN DEFAULT (FALSE) NOT NULL
 );
