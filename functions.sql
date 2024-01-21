@@ -4,6 +4,9 @@ DROP FUNCTION zmien_lokalizacje_sprzetu_nazwa(INTEGER, VARCHAR(50));
 DROP FUNCTION sumaryczny_przychod_zakres_id(DATE, DATE, INTEGER);
 DROP FUNCTION sumaryczny_przychod_zakres_nazwa(DATE, DATE, VARCHAR(50));
 
+DROP VIEW top_lokacje;
+DROP VIEW top_sprzet;
+
 
 
 /* Funkcja sluzaca do zmiany lokacji sprzetu; uzywana w przypadku, gdy chcemy przeniesc konkrenty sprzet do innej lokalizacji.
@@ -225,12 +228,17 @@ $$ LANGUAGE 'plpgsql';
 
 /* Widok top lokacje */
 create view top_lokacje as
-select sprzet.id_lokacji, count(id_wypozyczenia) as ilosc_wypozyczen
+select sprzet.id_lokacji as id_lokacji, count(id_wypozyczenia) as ilosc_wypozyczen
 from rejestr join sprzet using (id_sprzetu)
 group by sprzet.id_lokacji
 order by sprzet.id_lokacji;
 
-
+/*Widok top sprzęt*/
+create view top_sprzet as
+select sprzet.id_sprzetu as id_sprzetu, sprzet.id_lokacji as id_lokacji, count(id_wypozyczenia) as ilosc_wypozyczen
+from rejestr join sprzet using (id_sprzetu)
+group by sprzet.id_sprzetu
+order by ilosc_wypozyczen DESC, sprzet.id_sprzetu;
 
 
 /* Funkcja zmieniająca cenę w cenniku dla podanej lokacji i kategorii */
