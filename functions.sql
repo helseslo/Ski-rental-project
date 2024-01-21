@@ -1,7 +1,8 @@
 /* Usuwanie tabel oraz widoków w celu "wyzerowania bazy"  */
 DROP FUNCTION zmien_lokalizacje_sprzetu_id(INTEGER, INTEGER);
 DROP FUNCTION zmien_lokalizacje_sprzetu_nazwa(INTEGER, VARCHAR(50));
-DROP FUNCTION sumaryczny_przychod_zakres(DATE, DATE, INTEGER);
+DROP FUNCTION sumaryczny_przychod_zakres_id(DATE, DATE, INTEGER);
+DROP FUNCTION sumaryczny_przychod_zakres_nazwa(DATE, DATE, VARCHAR(50));
 
 
 
@@ -86,8 +87,8 @@ $$ LANGUAGE 'plpgsql';
 
 
 /* Funkcja wyliczająca sumaryczny przychód; (w podanym zakresie dat, dla podanej lokacji - opcjonalnie)*/
-CREATE OR REPLACE FUNCTION sumaryczny_przychod_zakres(data_od DATE, data_do DATE, id_lokacji_arg INTEGER DEFAULT NULL)
-RETURNS DECIMAl(7, 2) AS $$
+CREATE OR REPLACE FUNCTION sumaryczny_przychod_zakres_id(data_od DATE, data_do DATE, id_lokacji_arg INTEGER DEFAULT NULL)
+RETURNS TEXT AS $$
 DECLARE
     sumaryczny_przychod_podstawowy DECIMAL(7, 2);
     sumaryczny_przychod_kary DECIMAL(7, 2);
@@ -117,7 +118,7 @@ BEGIN
             sumaryczny_przychod_kary := 0;
         END IF;
         sumaryczny_przychod := sumaryczny_przychod_podstawowy+sumaryczny_przychod_kary;
-        RETURN (sumaryczny_przychod);
+        RETURN ('Sumaryczny przychód za ten okres to: ' || sumaryczny_przychod || ' zł.');
     END IF;
 
     SELECT count(1) > 0 INTO czy_lokacja_istnieje FROM lokacje WHERE id_lokacji = id_lokacji_arg;
@@ -137,13 +138,83 @@ BEGIN
     SELECT sum(rejestr.kara)
         INTO sumaryczny_przychod_kary
         FROM (rejestr JOIN sprzet USING(id_sprzetu))
-        WHERE (rejestr.data_zwrotu >= data_od AND rejestr.data_zwrotu <= data_do);
+        WHERE (rejestr.data_zwrotu >= data_od AND rejestr.data_zwrotu <= data_do AND sprzet.id_lokacji=id_lokacji_arg);
     IF (sumaryczny_przychod_kary IS NULL) THEN
         sumaryczny_przychod_kary := 0;
     END IF;
 
     sumaryczny_przychod := sumaryczny_przychod_podstawowy+sumaryczny_przychod_kary;
-    RETURN (sumaryczny_przychod);
+    RETURN ('Sumaryczny przychód za ten okres dla lokacji numer ' || id_lokacji_arg || ' to: ' || sumaryczny_przychod || ' zł.');
+
+
+END;
+$$ LANGUAGE 'plpgsql'; 
+
+
+
+
+
+/* Funkcja wyliczająca sumaryczny przychód; (w podanym zakresie dat, dla podanej nazwy lokacji - opcjonalnie)*/
+CREATE OR REPLACE FUNCTION sumaryczny_przychod_zakres_nazwa(data_od DATE, data_do DATE, nazwa_lokacji_arg VARCHAR(50) DEFAULT NULL)
+RETURNS TEXT AS $$
+DECLARE
+    sumaryczny_przychod_podstawowy DECIMAL(7, 2);
+    sumaryczny_przychod_kary DECIMAL(7, 2);
+    sumaryczny_przychod DECIMAL(7, 2);
+    czy_lokacja_istnieje BOOLEAN;
+    id_lokacji_arg INTEGER;
+BEGIN
+
+    /* Najpierw sprawdzamy, czy zostały wybrane prawidłowe daty*/
+    IF (data_od > data_do) THEN
+            RAISE EXCEPTION 'Zakres dat jest nieprawidłowy!';
+    END IF;
+
+    /* Procedura, jeśli nie została wybrana nazwa lokacji */
+    IF (nazwa_lokacji_arg IS NULL) THEN
+        SELECT sum(podstawowy_koszt)
+            INTO sumaryczny_przychod_podstawowy
+            FROM rejestr
+            WHERE (data_wypozyczenia >= data_od AND data_wypozyczenia <= data_do);
+        IF (sumaryczny_przychod_podstawowy IS NULL) THEN
+            sumaryczny_przychod_podstawowy := 0;
+        END IF;
+        SELECT sum(kara)
+            INTO sumaryczny_przychod_kary
+            FROM rejestr
+            WHERE (data_zwrotu >= data_od AND data_zwrotu <= data_do); 
+        IF (sumaryczny_przychod_kary IS NULL) THEN
+            sumaryczny_przychod_kary := 0;
+        END IF;
+        sumaryczny_przychod := sumaryczny_przychod_podstawowy+sumaryczny_przychod_kary;
+        RETURN ('Sumaryczny przychód za ten okres to: ' || sumaryczny_przychod || ' zł.');
+    END IF;
+
+    SELECT id_lokacji INTO id_lokacji_arg FROM lokacje WHERE nazwa_lokacji = nazwa_lokacji_arg;
+
+    IF id_lokacji_arg IS NULL THEN
+        RAISE EXCEPTION 'Nie istnieje lokacja o podanej nazwie!';
+    END IF;
+
+
+    /* Procedura, jeśli została wybrana nazwa lokacji */
+    SELECT sum(rejestr.podstawowy_koszt)
+        INTO sumaryczny_przychod_podstawowy
+        FROM (rejestr JOIN sprzet USING(id_sprzetu))
+        WHERE (rejestr.data_wypozyczenia >= data_od AND rejestr.data_wypozyczenia <= data_do AND sprzet.id_lokacji=id_lokacji_arg);
+    IF (sumaryczny_przychod_podstawowy IS NULL) THEN
+        sumaryczny_przychod_podstawowy := 0;
+    END IF;
+    SELECT sum(rejestr.kara)
+        INTO sumaryczny_przychod_kary
+        FROM (rejestr JOIN sprzet USING(id_sprzetu))
+        WHERE (rejestr.data_zwrotu >= data_od AND rejestr.data_zwrotu <= data_do AND sprzet.id_lokacji=id_lokacji_arg);
+    IF (sumaryczny_przychod_kary IS NULL) THEN
+        sumaryczny_przychod_kary := 0;
+    END IF;
+
+    sumaryczny_przychod := sumaryczny_przychod_podstawowy+sumaryczny_przychod_kary;
+    RETURN ('Sumaryczny przychód za ten okres dla lokacji ' || nazwa_lokacji_arg || ' to: ' || sumaryczny_przychod || ' zł.');
 
 
 END;
