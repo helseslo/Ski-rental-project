@@ -220,3 +220,80 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql'; 
 
+
+
+
+/* Widok top lokacje */
+create view top_lokacje as
+select sprzet.id_lokacji, count(id_wypozyczenia) as ilosc_wypozyczen
+from rejestr join sprzet using (id_sprzetu)
+group by sprzet.id_lokacji
+order by sprzet.id_lokacji;
+
+
+
+
+/* Funkcja zmieniająca cenę w cenniku dla podanej lokacji i kategorii */
+create or replace function zmien_cene (nowa_cena NUMERIC(7,2), moje_id_lokacji INTEGER, moje_id_kategorii INTEGER)
+returns TEXT as $$
+DECLARE
+    czy_istnieje_cena boolean;
+    czy_istnieje_lokacja boolean;
+    czy_istnieje_kategoria boolean;
+BEGIN
+
+	select count(1) > 0 into czy_istnieje_lokacja from lokacje where id_lokacji = moje_id_lokacji;
+    select count(1) > 0 into czy_istnieje_kategoria from kategorie where id_kategorii = moje_id_kategorii;
+	SELECT count(1) > 0 INTO czy_istnieje_cena FROM cennik WHERE id_kategorii = moje_id_kategorii 
+    								and id_lokacji = moje_id_lokacji;
+                                                            
+    if not czy_istnieje_lokacja THEN
+    	RAISE EXCEPTION 'Nie istnieje lokacja o podanym ID :(';
+    END IF;
+    
+    if not czy_istnieje_kategoria THEN
+    	RAISE EXCEPTION 'Nie istnieje kategoria o podanym ID :(';
+    END IF;
+    
+    /* Istnieje taka lokacja i kategoria, ale nie ma przypisanej ceny w cenniku dla tej lokacji i kategorii */
+    /* Wtedy dodajemy cenę do cennika */
+    IF NOT czy_istnieje_cena THEN
+    	insert into cennik (cena, id_lokacji, id_kategorii) values (nowa_cena, moje_id_lokacji, moje_id_kategorii);
+        return 'Dodano cenę do cennika';
+    END IF;
+    
+    update cennik set cena = nowa_cena
+    where id_lokacji = moje_id_lokacji AND id_kategorii = moje_id_kategorii;
+    
+    return 'Cena zmieniona poprawnie!';
+    
+ end;
+ $$ LANGUAGE 'plpgsql';
+
+
+
+/* Funkcja zmieniająca stanowisko pracownika o podanym id */
+create or replace function zmiana_stanowiska (nowe_id_stanowiska INTEGER, moje_id_pracownika INTEGER)
+returns TEXT as $$
+DECLARE
+	czy_istnieje_stanowisko BOOLEAN;
+    czy_istnieje_pracownik BOOLEAN;
+BEGIN
+	SELECT count(1) > 0 INTO czy_istnieje_stanowisko FROM pracownicy WHERE id_stanowiska = nowe_id_stanowiska;
+    SELECT count(1) > 0 INTO czy_istnieje_pracownik FROM pracownicy WHERE id_pracownika = moje_id_pracownika;
+    
+    IF NOT czy_istnieje_stanowisko THEN
+        RAISE EXCEPTION 'Nie istnieje stanowisko o podanym ID :(';
+    END IF;
+
+    IF NOT czy_istnieje_pracownik THEN
+        RAISE EXCEPTION 'Nie istnieje pracownik o podanym ID :(';
+    END IF;
+    
+    update pracownicy set id_stanowiska = nowe_id_stanowiska 
+    where id_pracownika = moje_id_pracownika;
+    
+    return 'Stanowisko zmieniono poprawnie!';
+    
+ end;
+ $$ LANGUAGE 'plpgsql';
