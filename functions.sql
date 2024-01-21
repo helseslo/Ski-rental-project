@@ -106,14 +106,14 @@ BEGIN
         SELECT sum(podstawowy_koszt)
             INTO sumaryczny_przychod_podstawowy
             FROM rejestr
-            WHERE (data_wypozyczenia >= data_od AND data_wypozyczenia <= data_do);
+            WHERE (data_wypozyczenia >= data_od AND data_wypozyczenia <= (data_do+1));
         IF (sumaryczny_przychod_podstawowy IS NULL) THEN
             sumaryczny_przychod_podstawowy := 0;
         END IF;
         SELECT sum(kara)
             INTO sumaryczny_przychod_kary
             FROM rejestr
-            WHERE (data_zwrotu >= data_od AND data_zwrotu <= data_do); 
+            WHERE (data_zwrotu >= data_od AND data_zwrotu <= (data_do+1)); 
         IF (sumaryczny_przychod_kary IS NULL) THEN
             sumaryczny_przychod_kary := 0;
         END IF;
@@ -131,14 +131,14 @@ BEGIN
     SELECT sum(rejestr.podstawowy_koszt)
         INTO sumaryczny_przychod_podstawowy
         FROM (rejestr JOIN sprzet USING(id_sprzetu))
-        WHERE (rejestr.data_wypozyczenia >= data_od AND rejestr.data_wypozyczenia <= data_do AND sprzet.id_lokacji=id_lokacji_arg);
+        WHERE (rejestr.data_wypozyczenia >= data_od AND rejestr.data_wypozyczenia <= (data_do+1) AND sprzet.id_lokacji=id_lokacji_arg);
     IF (sumaryczny_przychod_podstawowy IS NULL) THEN
         sumaryczny_przychod_podstawowy := 0;
     END IF;
     SELECT sum(rejestr.kara)
         INTO sumaryczny_przychod_kary
         FROM (rejestr JOIN sprzet USING(id_sprzetu))
-        WHERE (rejestr.data_zwrotu >= data_od AND rejestr.data_zwrotu <= data_do AND sprzet.id_lokacji=id_lokacji_arg);
+        WHERE (rejestr.data_zwrotu >= data_od AND rejestr.data_zwrotu <= (data_do+1) AND sprzet.id_lokacji=id_lokacji_arg);
     IF (sumaryczny_przychod_kary IS NULL) THEN
         sumaryczny_przychod_kary := 0;
     END IF;
@@ -175,14 +175,14 @@ BEGIN
         SELECT sum(podstawowy_koszt)
             INTO sumaryczny_przychod_podstawowy
             FROM rejestr
-            WHERE (data_wypozyczenia >= data_od AND data_wypozyczenia <= data_do);
+            WHERE (data_wypozyczenia >= data_od AND data_wypozyczenia <= (data_do+1));
         IF (sumaryczny_przychod_podstawowy IS NULL) THEN
             sumaryczny_przychod_podstawowy := 0;
         END IF;
         SELECT sum(kara)
             INTO sumaryczny_przychod_kary
             FROM rejestr
-            WHERE (data_zwrotu >= data_od AND data_zwrotu <= data_do); 
+            WHERE (data_zwrotu >= data_od AND data_zwrotu <= (data_do+1)); 
         IF (sumaryczny_przychod_kary IS NULL) THEN
             sumaryczny_przychod_kary := 0;
         END IF;
@@ -201,14 +201,14 @@ BEGIN
     SELECT sum(rejestr.podstawowy_koszt)
         INTO sumaryczny_przychod_podstawowy
         FROM (rejestr JOIN sprzet USING(id_sprzetu))
-        WHERE (rejestr.data_wypozyczenia >= data_od AND rejestr.data_wypozyczenia <= data_do AND sprzet.id_lokacji=id_lokacji_arg);
+        WHERE (rejestr.data_wypozyczenia >= data_od AND rejestr.data_wypozyczenia <= (data_do+1) AND sprzet.id_lokacji=id_lokacji_arg);
     IF (sumaryczny_przychod_podstawowy IS NULL) THEN
         sumaryczny_przychod_podstawowy := 0;
     END IF;
     SELECT sum(rejestr.kara)
         INTO sumaryczny_przychod_kary
         FROM (rejestr JOIN sprzet USING(id_sprzetu))
-        WHERE (rejestr.data_zwrotu >= data_od AND rejestr.data_zwrotu <= data_do AND sprzet.id_lokacji=id_lokacji_arg);
+        WHERE (rejestr.data_zwrotu >= data_od AND rejestr.data_zwrotu <= (data_do+1) AND sprzet.id_lokacji=id_lokacji_arg);
     IF (sumaryczny_przychod_kary IS NULL) THEN
         sumaryczny_przychod_kary := 0;
     END IF;

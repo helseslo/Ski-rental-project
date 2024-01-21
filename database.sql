@@ -76,9 +76,9 @@ CREATE TABLE rejestr(
     id_wypozyczenia INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_klienta INTEGER REFERENCES klienci(id_klienta) ON UPDATE CASCADE,
     id_sprzetu INTEGER REFERENCES sprzet(id_sprzetu) ON UPDATE CASCADE,
-    data_wypozyczenia DATE DEFAULT(CURRENT_DATE) NOT NULL,
-    data_zwrotu DATE CHECK (data_zwrotu > data_wypozyczenia) NOT NULL,
-    maksymalne_przedluzenie DATE DEFAULT('3000-01-01') NOT NULL,
+    data_wypozyczenia TIMESTAMP DEFAULT(CURRENT_DATE) NOT NULL,
+    data_zwrotu TIMESTAMP CHECK (data_zwrotu > data_wypozyczenia) NOT NULL,
+    maksymalne_przedluzenie TIMESTAMP DEFAULT('3000-01-01') NOT NULL,
     podstawowy_koszt DECIMAL(7, 2) DEFAULT(0) CHECK (podstawowy_koszt >= 0) NOT NULL,
     kara DECIMAL (7, 2) DEFAULT(0) CHECK (kara >= 0) NOT NULL,
     czy_aktualne BOOLEAN DEFAULT (FALSE) NOT NULL
@@ -162,9 +162,9 @@ INSERT INTO klienci (imie, nazwisko, nr_telefonu, nr_dowodu, PESEL) VALUES ('Ann
 INSERT INTO klienci (imie, nazwisko, nr_telefonu, nr_dowodu, PESEL) VALUES ('Tomasz', 'Anartniemasz', 222222222, '123C', 12128801012);
 
 /* Inserty - rejestr */
-INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, podstawowy_koszt) VALUES (1, 1, '2024-01-01', '2024-01-02', 1);
-INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, podstawowy_koszt) VALUES (1, 9, '2024-01-01', '2024-01-02', 1);
-INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, podstawowy_koszt) VALUES (2, 1, '2024-01-03', '2024-01-04', 1);
-INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, podstawowy_koszt) VALUES (2, 9, '2024-01-03', '2024-01-04', 1);
-INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, podstawowy_koszt, kara) VALUES (3, 6, '2024-01-01', '2024-01-03', 50, 50);
+INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, podstawowy_koszt) VALUES (1, 1, '2024-01-01 17:31:12', '2024-01-02 17:31:10', 1);
+INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, podstawowy_koszt) VALUES (1, 9, '2024-01-01 12:00:00', '2024-01-02 11:00:00', 1);
+INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, podstawowy_koszt) VALUES (2, 1, '2024-01-03 14:00:00', '2024-01-04 12:00:00', 1);
+INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, podstawowy_koszt) VALUES (2, 9, '2024-01-03 10:00:00', '2024-01-04 9:00:00', 1);
+INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, podstawowy_koszt, kara) VALUES (3, 6, '2024-01-01 10:00:00', '2024-01-03 10:00:00', 50, 50);
 
