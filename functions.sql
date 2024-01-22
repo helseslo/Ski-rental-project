@@ -351,3 +351,48 @@ AS $$
     WHERE id_lokacji=id_lokacji_arg;
 $$ LANGUAGE SQL;
 
+
+/* Funkcja zmieniająca dane klienta */
+ create or replace function zmien_dane_klienta(moje_id_klienta INTEGER, nowe_imie VARCHAR(50),
+                                                nowe_nazwisko VARCHAR(50), nowy_nr_telefonu VARCHAR(9),
+                           					 	nowy_nr_dowodu VARCHAR(8), nowy_pesel VARCHAR(11),
+                            					nowa_czarna_lista BOOLEAN)
+ returns TEXT AS $$
+ DEclare
+ 	czy_istnieje_klient boolean;
+    
+ BEGIN
+ 
+ 	SELECT count(1) > 0 INTO czy_istnieje_klient FROM klienci WHERE id_klienta = moje_id_klienta;
+    
+    IF NOT czy_istnieje_klient THEN
+        RAISE EXCEPTION 'W bazie nie istnieje klient o podanym ID.';
+    END IF;
+    
+   update klienci
+   set  imie = nowe_imie
+   where id_klienta = moje_id_klienta;
+   
+   update klienci
+   set  nazwisko = nowe_nazwisko
+   where id_klienta = moje_id_klienta;
+   
+   update klienci
+   set  nr_telefonu = nowy_nr_telefonu
+   where id_klienta = moje_id_klienta;
+   
+   update klienci
+   set  nr_dowodu = nowy_nr_dowodu
+   where id_klienta = moje_id_klienta;
+   
+   update klienci
+   set  pesel = nowy_pesel
+   where id_klienta = moje_id_klienta;
+   
+   update klienci
+   set  czarna_lista = nowa_czarna_lista
+   where id_klienta = moje_id_klienta;
+   
+   return 'Zmieniono poprawnie!';
+  end;
+  $$ LANGUAGE 'plpgsql';
