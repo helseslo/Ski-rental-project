@@ -305,3 +305,44 @@ BEGIN
     
  end;
  $$ LANGUAGE 'plpgsql';
+
+
+/* Funkcja zmieniająca cenę o podany procent w cenniku dla podanej lokacji i kategorii */
+create or replace function zmien_cene_o_procent (procent DECIMAL(7, 2), moje_id_lokacji INTEGER, moje_id_kategorii INTEGER)
+RETURNS TEXT AS $$
+DECLARE
+	czy_istnieje_cena boolean;
+    czy_istnieje_lokacja boolean;
+    czy_istnieje_kategoria boolean;
+BEGIN
+
+	select count(1) > 0 into czy_istnieje_lokacja from lokacje where id_lokacji = moje_id_lokacji;
+    select count(1) > 0 into czy_istnieje_kategoria from kategorie where id_kategorii = moje_id_kategorii;
+	SELECT count(1) > 0 INTO czy_istnieje_cena FROM cennik WHERE id_kategorii = moje_id_kategorii 
+    								and id_lokacji = moje_id_lokacji;
+                                    
+    if procent < -1 then
+    	raise exception 'Nie można obniżyć ceny o więcej niż 100 procent!' ;
+    end if;
+                                                            
+    if not czy_istnieje_lokacja THEN
+    	RAISE EXCEPTION 'Nie istnieje lokacja o podanym ID :(';
+    END IF;
+    
+    if not czy_istnieje_kategoria THEN
+    	RAISE EXCEPTION 'Nie istnieje kategoria o podanym ID :(';
+    END IF;
+    
+    if not czy_istnieje_cena THEN
+    	RAISE EXCEPTION 'W cenniku nie ma podanej ceny dla wybranej lokacji i kategorii.
+        Najpierw dodaj cenę do cennika.';
+    END IF;
+    
+    
+    update cennik set cena = (1 + procent)*cena
+    where id_lokacji = moje_id_lokacji AND id_kategorii = moje_id_kategorii;
+    
+    return 'Cena zmieniona poprawnie!';
+    
+ end;
+ $$ LANGUAGE 'plpgsql';
