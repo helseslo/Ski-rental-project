@@ -235,6 +235,8 @@ group by sprzet.id_sprzetu
 order by ilosc_wypozyczen DESC, sprzet.id_sprzetu;
 
 
+
+
 /* Funkcja zmieniająca cenę w cenniku dla podanej lokacji i kategorii */
 create or replace function zmien_cene (nowa_cena NUMERIC(7,2), moje_id_lokacji INTEGER, moje_id_kategorii INTEGER)
 returns TEXT as $$
@@ -274,6 +276,8 @@ BEGIN
 
 
 
+
+
 /* Funkcja zmieniająca stanowisko pracownika o podanym id */
 create or replace function zmiana_stanowiska (nowe_id_stanowiska INTEGER, moje_id_pracownika INTEGER)
 returns TEXT as $$
@@ -299,6 +303,8 @@ BEGIN
     
  end;
  $$ LANGUAGE 'plpgsql';
+
+
 
 
 /* Funkcja zmieniająca cenę o podany procent w cenniku dla podanej lokacji i kategorii */
@@ -343,6 +349,7 @@ BEGIN
 
 
 
+
  /* Funkcja zwracająca pracowników dla podanej lokacji; zamiast id_stanowiska wyświetlana będzie jego nazwa*/
 /* W razie podania lokacji, która nie istnieje, będziemy zwracać pustą tabelę*/
 
@@ -367,6 +374,8 @@ BEGIN
 
 END;
 $func$;*/
+
+
 
 
 /* Funkcja zmieniająca dane klienta */
@@ -413,3 +422,44 @@ $func$;*/
    return 'Zmieniono poprawnie!';
   end;
   $$ LANGUAGE 'plpgsql';
+
+
+
+
+/* Funkcja zmieniająca dane pracownika; analogiczna do tej dla klienta */
+create or replace function zmien_dane_pracownika(moje_id_pracownika INTEGER, nowe_imie VARCHAR(50),
+                                                nowe_nazwisko VARCHAR(50), nowe_id_lokacji INTEGER,
+                           					 	nowe_id_stanowiska INTEGER)
+ returns TEXT AS $$
+ DEclare
+ 	czy_istnieje_pracownik boolean;
+    
+ BEGIN
+ 
+ 	SELECT count(1) > 0 INTO czy_istnieje_pracownik FROM pracownicy WHERE id_pracownika = moje_id_pracownika;
+    
+    IF NOT czy_istnieje_pracownik THEN
+        RAISE EXCEPTION 'W bazie nie istnieje pracownik o podanym ID.';
+    END IF;
+    
+   update pracownicy
+   set  imie = nowe_imie
+   where id_pracownika = moje_id_pracownika;
+   
+   update pracownicy
+   set  nazwisko = nowe_nazwisko
+   where id_pracownika = moje_id_pracownika;
+   
+   update pracownicy
+   set  id_lokacji = nowe_id_lokacji
+   where id_pracownika = moje_id_pracownika;
+   
+   update pracownicy
+   set  id_stanowiska = nowe_id_stanowiska
+   where id_pracownika = moje_id_pracownika;
+   
+   
+   return 'Zmieniono poprawnie!';
+  end;
+  $$ LANGUAGE 'plpgsql';
+  
