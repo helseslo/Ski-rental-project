@@ -1,4 +1,8 @@
 
+DROP FUNCTION pracownicy_dla_lokacji (INTEGER);
+
+
+
 /* Funkcja sluzaca do zmiany lokacji sprzetu; uzywana w przypadku, gdy chcemy przeniesc konkrenty sprzet do innej lokalizacji.
 W tej wersji jako argument podajemy id sprzetu, ktorego lokacje chcemy zmienic oraz id tej lokacji.*/
 
@@ -342,14 +346,27 @@ BEGIN
  /* Funkcja zwracająca pracowników dla podanej lokacji; zamiast id_stanowiska wyświetlana będzie jego nazwa*/
 /* W razie podania lokacji, która nie istnieje, będziemy zwracać pustą tabelę*/
 
-CREATE OR REPLACE FUNCTION pracownicy_dla_lokacji (id_lokacji_arg INTEGER, OUT id_pracownika INTEGER, OUT imie VARCHAR(50),
+/*CREATE OR REPLACE FUNCTION pracownicy_dla_lokacji (id_lokacji_arg INTEGER, OUT id_pracownika INTEGER, OUT imie VARCHAR(50),
 OUT nazwisko VARCHAR(50), OUT nazwa_stanowiska VARCHAR(50))
 RETURNS SETOF record 
 AS $$
     SELECT pracownicy.id_pracownika, pracownicy.imie, pracownicy.nazwisko, stanowiska.nazwa_stanowiska
     FROM (pracownicy JOIN stanowiska USING (id_stanowiska))
     WHERE id_lokacji=id_lokacji_arg;
-$$ LANGUAGE SQL;
+$$ LANGUAGE SQL;*/
+
+/*CREATE OR REPLACE FUNCTION pracownicy_dla_lokacji(id_lokacji_arg INTEGER)
+  RETURNS SETOF record
+  LANGUAGE plpgsql AS
+$func$
+BEGIN
+   RETURN QUERY EXECUTE format('
+      SELECT pracownicy.id_pracownika, pracownicy.imie, pracownicy.nazwisko, stanowiska.nazwa_stanowiska
+    FROM (pracownicy JOIN stanowiska USING (id_stanowiska))
+    WHERE id_lokacji='||_id||'');
+
+END;
+$func$;*/
 
 
 /* Funkcja zmieniająca dane klienta */
