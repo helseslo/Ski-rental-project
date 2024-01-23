@@ -39,14 +39,18 @@ shinyServer(function(input, output) {
     load.locations.info(input$nazwa_lokacji) # wywołanie funkcji z example_functions.r
   )
   
-  output$zmiana.stanowiska <- renderText(
-    nowe_id_stanowiska <- reactive(input$nowe_id_stanowiska),
-    id_pracownika_arg <- reactive(input$id_pracownika_arg),
-    load.zmiana.stanowiska(nowe_id_stanowiska(), id_pracownika_arg()) # wywołanie funkcji z example_functions.r
-  )
+  # output$zmiana.stanowiska <- renderText(
+  #   nowe_id_stanowiska <- reactive(input$nowe_id_stanowiska),
+  #   id_pracownika_arg <- reactive(input$id_pracownika_arg),
+  #   load.zmiana.stanowiska(nowe_id_stanowiska(), id_pracownika_arg()) # wywołanie funkcji z example_functions.r
+  # )
   
+  observeEvent(input$upadate.pracownicy,
+               zmiana.stanowiska(input$stanowiska.id_stanowiska,
+                                    input$pracownicy.id_pracownika)) 
   
-  
+  observeEvent(input$update.pracownicy,
+               update.pracownicy(input$pracownicy.to.update))
   # 
   # generowanie tabelki z ratingami podanego użytkownika
   # output$login.ratings <- renderDataTable(

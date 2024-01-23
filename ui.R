@@ -37,21 +37,23 @@ shinyUI(fluidPage(
                # etykieta ze średnią oceną filmu
                # verbatimTextOutput('locations.info') # odwołanie do output$movie.avg.rating z server.r
                tableOutput('locations.info'),
-               
-               
-               
-               textInput(textInput("nowe_id_stanowiska", "id_pracownika_arg"),
-                           label='coś'),
-                           #choices=load.locations2()), # wywołanie funkcji z example_functions.r
-               # tabelka z ocenami filmu
-               #dataTableOutput('locations.info'), # odwołanie do output$movie.ratings z server.r
-               # etykieta ze średnią oceną filmu
-               # verbatimTextOutput('locations.info') # odwołanie do output$movie.avg.rating z server.r
-               textOutput('zmiana.stanowiska')
       ),
       
-      
-      
+
+      tabPanel('Zmiana stanowiska',
+               
+
+               selectInput(inputId='stanowiska.id_stanowiska',
+                           label='Wybierz ID nowego stanowiska',
+                           choices=load.stanowiska()),
+               selectInput(inputId='pracownicy.id_pracownika',
+                           label='Wybierz ID pracownika',
+                           choices=load.pracownicy()),
+
+               actionButton(inputId='update.pracownicy',
+                            label='Potwierdź')
+      ),
+
       
       tabPanel("Lista lokacji",
                tableOutput('lokacje_lista')),

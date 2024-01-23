@@ -59,36 +59,25 @@ load.locations2 <- function() {
   return(locations)
 }
 
-
-load.zmiana.stanowiska <- function(nowe_id_stanowiska, id_pracownika_arg) {
-  query = paste0("SELECT zmiana_stanowiska('",
-                 nowe_id_stanowiska,"','",id_pracownika_arg,")")
+load.stanowiska <- function() {
+  query = "SELECT id_stanowiska FROM stanowiska"
   con = open.my.connection()
   res = dbSendQuery(con,query)
+  stanowiska = dbFetch(res)
   dbClearResult(res)
   close.my.connection(con)
+  return(stanowiska)
 }
 
-# add.or.update.rating <- function(title,nick,rating) {
-#   query = paste0("SELECT add_or_update_rating('",
-#                  title,"','",nick,"',",rating,")")
-#   con = open.my.connection()
-#   res = dbSendQuery(con,query)
-#   dbClearResult(res)
-#   close.my.connection(con)
-# }
-
-
-# 
-# load.movies <- function() {
-#   query = "SELECT title FROM movie"
-#   con = open.my.connection()
-#   res = dbSendQuery(con,query)
-#   movies = dbFetch(res)
-#   dbClearResult(res)
-#   close.my.connection(con)
-#   return(movies)add_or_update_rating
-# }
+load.pracownicy <- function() {
+  query = "SELECT id_pracownika FROM pracownicy"
+  con = open.my.connection()
+  res = dbSendQuery(con,query)
+  pracownicy = dbFetch(res)
+  dbClearResult(res)
+  close.my.connection(con)
+  return(pracownicy)
+}
 
 
 
@@ -104,59 +93,14 @@ load.locations.info <- function(nazwa_lokacji) {
   return(locations)
 }
 
-# load.movie.avg.rating <- function(title) {
-#   query = paste0("SELECT title, year, average_rating
-#                 FROM movie_avg_rating WHERE title = '",
-#                  title,"' LIMIT 1")
-#   con = open.my.connection()
-#   res = dbSendQuery(con,query)
-#   rating = dbFetch(res)
-#   dbClearResult(res)
-#   close.my.connection(con)
-#   return(rating$average_rating)
-# }
-# 
-# load.movie.ratings <- function(title) {
-#   query = paste0("SELECT title, year, nick, rating
-#                 FROM movie_ratings WHERE title = '",
-#                  title,"'")
-#   con = open.my.connection()
-#   res = dbSendQuery(con,query)
-#   ratings = dbFetch(res)
-#   dbClearResult(res)
-#   close.my.connection(con)
-#   return(ratings)
-# }
-# 
-# load.login.ratings <- function(nick) {
-#   query = paste0("SELECT title, year, nick, rating
-#                 FROM movie_ratings WHERE nick = '",
-#                  nick,"'")
-#   con = open.my.connection()
-#   res = dbSendQuery(con,query)
-#   ratings = dbFetch(res)
-#   dbClearResult(res)
-#   close.my.connection(con)
-#   return(ratings)
-# }
-
-# add.or.update.rating <- function(title,nick,rating) {
-#   query = paste0("SELECT add_or_update_rating('",
-#                  title,"','",nick,"',",rating,")")
-#   con = open.my.connection()
-#   res = dbSendQuery(con,query)
-#   dbClearResult(res)
-#   close.my.connection(con)
-# }
-
-# add.login <- function(nick) {
-#   if(trimws(nick)!=""){
-#     query = paste0("INSERT INTO login(nick) VALUES ('",nick,"')")
-#     con = open.my.connection()
-#     res = dbSendQuery(con,query)
-#     dbClearResult(res)
-#     close.my.connection(con)
-#   }}
+zmiana.stanowiska <- function(id_stanowiska, id_pracownika) {
+  query = paste0("SELECT zmiana_stanowiska('",
+                 id_stanowiska,"','",id_pracownika,")")
+  con = open.my.connection()
+  res = dbSendQuery(con,query)
+  dbClearResult(res)
+  close.my.connection(con)
+}
 
 
 
