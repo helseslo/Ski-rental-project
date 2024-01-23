@@ -8,7 +8,7 @@ library(shinyalert)
 library(DBI)
 library(RPostgreSQL)
 setwd("/Users/hss/Documents/bazunie/Ski-rental-project")
-source(file='functions.R')
+#source(file='functions.R')
 
 
 con <- dbConnect(RPostgres::Postgres(),
@@ -145,6 +145,7 @@ server <- shinyServer(function(input, output, session){
                                                   miasto, ulica, nr_posesji FROM lokacje order by 1"), align = "l", width = "100%")
     shinyalert(print(data[1,1]), type = "info")
   })
+  
 
 })
 
