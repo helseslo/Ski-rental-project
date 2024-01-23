@@ -49,8 +49,8 @@ shinyServer(function(input, output) {
                zmiana.stanowiska(input$stanowiska.id_stanowiska,
                                     input$pracownicy.id_pracownika)) 
   
-  observeEvent(input$update.pracownicy,
-               update.pracownicy(input$pracownicy.to.update))
+  # observeEvent(input$update.pracownicy,
+  #              update.pracownicy(input$pracownicy.to.update))
   # 
   # generowanie tabelki z ratingami podanego użytkownika
   # output$login.ratings <- renderDataTable(

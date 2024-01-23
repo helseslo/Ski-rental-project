@@ -12,12 +12,12 @@ source(file='functions.R')
 
 shinyUI(fluidPage(
   
-
+  
   useShinyjs(), # umożliwia wygodne odświeżanie aplikacji
   skin = 'black',
   # tytuł naszej aplikacji
   titlePanel("WITAMY W SIECI WYPOŻYCZALNI SPRZĘTU NARCIASKIEGO \"PANDA 3\"!"),
-
+  
   # w tej prostej aplikacji mamy tylko jeden główny panel, który zawiera 4 "taby"
   # oczywiście można dowolnie rozbudowywać interfejs graficzny np. o dodatkowe menu po boku
   
@@ -41,7 +41,7 @@ shinyUI(fluidPage(
                tableOutput('locations.info'),
       ),
       
-
+      
       tabPanel('Zmiana stanowiska',
                
                selectInput(inputId='pracownicy.id_pracownika',
@@ -50,12 +50,12 @@ shinyUI(fluidPage(
                selectInput(inputId='stanowiska.id_stanowiska',
                            label='Wybierz ID nowego stanowiska',
                            choices=load.stanowiska()),
-
-
-               actionButton(inputId='zmiana.stanowiska',
+               
+               
+               actionButton(inputId='update.pracownicy',
                             label='Potwierdź')
       ),
-
+      
       
       tabPanel("Lista lokacji",
                tableOutput('lokacje_lista')),
