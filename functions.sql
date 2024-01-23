@@ -463,3 +463,44 @@ create or replace function zmien_dane_pracownika(moje_id_pracownika INTEGER, now
   end;
   $$ LANGUAGE 'plpgsql';
   
+
+
+
+/* funkcja do zwracania sprzętu */
+create or replace function zwrot (moje_id_wypozyczenia INTEGER)
+returns text AS $$
+DECLARE
+	czy_istnieje_wypozyczenie BOOLEAN;
+    czy_jeszcze_nieoddane BOOLEAN;
+    nr_sprzetu INTEGER;
+
+BEGIN
+	
+    /* czy_jeszcze_nieoddane zapobiega zaktualizowaniu daty oddania w przypadku wypożyczenia, które jest już nieaktualne */
+	SELECT count(1) > 0 INTO czy_istnieje_wypozyczenie FROM rejestr WHERE id_wypozyczenia = moje_id_wypozyczenia;
+    select count(1) > 0 into czy_jeszcze_nieoddane from rejestr where id_wypozyczenia = moje_id_wypozyczenia and czy_aktualne = 't';
+    select id_sprzetu into nr_sprzetu from rejestr where id_wypozyczenia = moje_id_wypozyczenia;
+    
+     if not czy_istnieje_wypozyczenie THEN
+    	RAISE EXCEPTION 'W bazie nie istnieje wypozyczenie o podanym ID !';
+    END IF;
+    
+    if not czy_jeszcze_nieoddane THEN
+    	RAISE EXCEPTION 'Dla wypozyczenia o podanym ID zwrot juz zostal dokonany.';
+    END IF; 
+    
+    update rejestr set data_zwrotu = (SELECT CURRENT_TIMESTAMP) 
+    WHERE id_wypozyczenia = moje_id_wypozyczenia;
+    
+    /* musimy zmienic atrybut czy_aktualne */
+    update rejestr set czy_aktualne = 'f'
+    where id_wypozyczenia = moje_id_wypozyczenia;
+    
+    /* w tabeli sprzęt musimy zmienić atrybut 'stan_wypozyczenia' dla sprzętu, który został oddany */
+    update sprzet set stan_wypozyczenia = 'f'
+    where id_sprzetu = nr_sprzetu;
+    
+    return 'Zwrot dodany poprawnie!';
+    
+ end;
+ $$ LANGUAGE 'plpgsql';
