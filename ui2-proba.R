@@ -1,6 +1,7 @@
 #install.packages("shiny")
 #install.packages("shinyjs")
 library(shinythemes)
+library(shinydashboard)
 library(shiny)
 library(DT)
 library(shinyjs) # ta biblioteka umożliwi łatwe odświeżanie aplikacji
@@ -14,7 +15,7 @@ shinyUI(fluidPage(
   
   
   useShinyjs(), # umożliwia wygodne odświeżanie aplikacji
-  skin = 'black',
+
   # tytuł naszej aplikacji
   titlePanel("WITAMY W SIECI WYPOŻYCZALNI SPRZĘTU NARCIASKIEGO \"PANDA 3\"!"),
   
@@ -52,13 +53,20 @@ shinyUI(fluidPage(
                            choices=load.stanowiska()),
                
                
-               actionButton(inputId='update.pracownicy',
+               actionButton(inputId='zmiana.stanowiska',
                             label='Potwierdź')
       ),
       
-      
-      tabPanel("Lista lokacji",
-               tableOutput('lokacje_lista')),
+      tabPanel('Pracownicy',
+               selectInput(inputId='id_pracownika',
+                           label='Wybierz ID pracownika',
+                           choices=load.pracownicy()), # wywołanie funkcji z example_functions.r
+               # tabelka z ocenami filmu
+               #dataTableOutput('locations.info'), # odwołanie do output$movie.ratings z server.r
+               # etykieta ze średnią oceną filmu
+               # verbatimTextOutput('locations.info') # odwołanie do output$movie.avg.rating z server.r
+               tableOutput('pracownicy.info'),
+      ),
       
     )
   )
