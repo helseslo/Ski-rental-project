@@ -87,6 +87,7 @@ CREATE TABLE rejestr(
 /* Inserty - lokacje */
 INSERT INTO lokacje (nazwa_lokacji, miasto, ulica, nr_posesji) VALUES ('St. Orczyk', 'Zloty Stok', 'Odjazdowa', 314);
 INSERT INTO lokacje (nazwa_lokacji, miasto, ulica, nr_posesji) VALUES ('Nie na halny', 'Zajezdzone Nowe', 'Portowa', 5432);
+INSERT INTO lokacje (nazwa_lokacji, miasto, ulica, nr_posesji) VALUES ('Bazowa', 'Wrocław', 'Matematyczna', 1);
 
 /* Inserty - stanowiska */
 
