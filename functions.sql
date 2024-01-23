@@ -504,3 +504,24 @@ BEGIN
     
  end;
  $$ LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION dodaj_lokacje(nazwa_lokacji_arg VARCHAR(50), miasto_arg VARCHAR(50), ulica_arg VARCHAR(50),nr_posesji_arg VARCHAR(50))
+RETURNS TEXT AS $$
+DECLARE
+    czy_lokacja_istnieje BOOLEAN;
+BEGIN
+
+    SELECT count(1) > 0 INTO czy_lokacja_istnieje FROM lokacje WHERE nazwa_lokacji = nazwa_lokacji_arg;
+
+
+	IF czy_lokacja_istnieje THEN
+        RAISE EXCEPTION 'Istnieje juz lokacja o podanej nazwie!';
+    END IF;
+
+
+    INSERT INTO lokacje (nazwa_lokacji, miasto, ulica, nr_posesji) VALUES 
+    (nazwa_lokacji_arg, miasto_arg, ulica_arg, nr_posesji_arg);
+    RETURN 'Lokacja dodana poprawnie!';
+END;
+$$ LANGUAGE 'plpgsql'; 
+
