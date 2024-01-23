@@ -93,6 +93,18 @@ load.locations.info <- function(nazwa_lokacji) {
   return(locations)
 }
 
+load.pracownicy.info <- function(id_pracownika) {
+  query = paste0("SELECT id_pracownika, imie, nazwisko, id_lokacji, id_stanowiska
+                FROM pracownicy WHERE id_pracownika = '",
+                 id_pracownika,"' LIMIT 1")
+  con = open.my.connection()
+  res = dbSendQuery(con,query)
+  pracownicy = dbFetch(res)
+  dbClearResult(res)
+  close.my.connection(con)
+  return(pracownicy)
+}
+
 zmiana.stanowiska <- function(id_stanowiska, id_pracownika) {
   query = paste0("SELECT zmiana_stanowiska('",
                  id_stanowiska,"','",id_pracownika,")")

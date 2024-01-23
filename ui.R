@@ -56,9 +56,16 @@ shinyUI(fluidPage(
                             label='Potwierdź')
       ),
 
-      
-      tabPanel("Lista lokacji",
-               tableOutput('lokacje_lista')),
+      tabPanel('Pracownicy',
+               selectInput(inputId='id_pracownika',
+                           label='Wybierz ID pracownika',
+                           choices=load.pracownicy()), # wywołanie funkcji z example_functions.r
+               # tabelka z ocenami filmu
+               #dataTableOutput('locations.info'), # odwołanie do output$movie.ratings z server.r
+               # etykieta ze średnią oceną filmu
+               # verbatimTextOutput('locations.info') # odwołanie do output$movie.avg.rating z server.r
+               tableOutput('pracownicy.info'),
+      ),
       
     )
   )
