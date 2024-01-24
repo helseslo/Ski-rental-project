@@ -159,9 +159,9 @@ INSERT INTO cennik (cena, kara, id_lokacji, id_kategorii) VALUES (5, 10, 1, 4);
 INSERT INTO cennik (cena, kara, id_lokacji, id_kategorii) VALUES (6, 12, 2, 4);
 
 /* Inserty - klienci */
-INSERT INTO klienci (imie, nazwisko, nr_telefonu, nr_dowodu, PESEL) VALUES ('Jurgen', 'Stokonen', 000000000, '123A', 01119911188);
-INSERT INTO klienci (imie, nazwisko, nr_telefonu, nr_dowodu, PESEL) VALUES ('Anna', 'Wciag-Wyciag', 111111111, '123B', 01010101011);
-INSERT INTO klienci (imie, nazwisko, nr_telefonu, nr_dowodu, PESEL) VALUES ('Tomasz', 'Anartniemasz', 222222222, '123C', 12128801012);
+INSERT INTO klienci (imie, nazwisko, nr_telefonu, nr_dowodu, PESEL) VALUES ('Jurgen', 'Stokonen', '000000000', '123A', '01119911188');
+INSERT INTO klienci (imie, nazwisko, nr_telefonu, nr_dowodu, PESEL) VALUES ('Anna', 'Wciag-Wyciag', '111111111', '123B', '01010101011');
+INSERT INTO klienci (imie, nazwisko, nr_telefonu, nr_dowodu, PESEL) VALUES ('Tomasz', 'Anartniemasz', '222222222', '123C', '12128801012');
 
 /* Inserty - rejestr */
 INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, podstawowy_koszt) VALUES (1, 1, '2024-01-01 17:31:12', '2024-01-02 17:31:10', 1);
