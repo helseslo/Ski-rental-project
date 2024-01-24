@@ -20,7 +20,8 @@ con <- dbConnect(RPostgres::Postgres(),
                  user = 'hela', # nasza nazwa u�ytkownika psql
                  password = 'hela') # i nasze has�o tego u�ytkownika
 
-# obiekty do rendertable do outputu w sekcji serwer
+# obiekty do rendertable do outputu w sekcji serwer;
+# Całe podstawowe tabele 
 lokacje <- dbGetQuery(con, "SELECT * FROM lokacje")
 pracownicy <- dbGetQuery(con, "SELECT * FROM pracownicy")
 stanowiska <- dbGetQuery(con, "SELECT * FROM stanowiska")
@@ -29,7 +30,9 @@ sprzet <- dbGetQuery(con, "SELECT * FROM sprzet")
 cennik <- dbGetQuery(con, "SELECT * FROM cennik")
 klienci <- dbGetQuery(con, "SELECT * FROM klienci")
 rejestr <- dbGetQuery(con, "SELECT * FROM rejestr")
-
+# Widoki
+top_lokacje <- dbGetQuery(con, "SELECT * FROM top_lokacje")
+top_sprzet <- dbGetQuery(con, "SELECT * FROM top_sprzet")
 
 
 
@@ -72,12 +75,13 @@ ui <- tagList(
               fluidPage(theme = shinytheme("flatly"),
                         height = '100%',
                         tabsetPanel(
-                          tabPanel("Wszystkie lokacje", dataTableOutput('lokacje_lista', width="70%")),
+                          tabPanel("Wszystkie lokacje", dataTableOutput('lokacje_lista', width="60%")),
                           tabPanel("Utwórz lokację",textInput("lokacja_dodanie_nazwa","Podaj nazwę lokacji", value=""),
                                    textInput("lokacja_dodanie_miasto","Podaj miasto", value=""),
                                    textInput("lokacja_dodanie_ulica","Podaj ulicę", value=""),
                                    textInput("lokacja_dodanie_nr","Podaj numer posesji", value=""),
                                    actionButton("dodaj_lokacje","Dodaj lokację")),
+                          tabPanel("Top lokacje", dataTableOutput('top_lokacje_lista', width="30%")),
                           
                         )
                     )
@@ -88,7 +92,7 @@ ui <- tagList(
     tabItem(tabName="pracownicy", h2("Pracownicy"),
               fluidPage(theme = shinytheme("flatly"),
                          tabsetPanel(
-                           tabPanel("Wszyscy pracownicy", dataTableOutput ('pracownicy_lista', width="70%")),
+                           tabPanel("Wszyscy pracownicy", dataTableOutput ('pracownicy_lista', width="50%")),
                            
                          )
               )
@@ -97,7 +101,7 @@ ui <- tagList(
               fluidPage(
                 theme = shinytheme("flatly"),
                 tabsetPanel(
-                  tabPanel("Wszystkie stanowiska", dataTableOutput ('stanowiska_lista', width="70%")),
+                  tabPanel("Wszystkie stanowiska", dataTableOutput ('stanowiska_lista', width="30%")),
                   
                 )
               )
@@ -106,7 +110,7 @@ ui <- tagList(
             fluidPage(
               theme = shinytheme("flatly"),
               tabsetPanel(
-                tabPanel("Wszystkie kategorie", dataTableOutput ('kategorie_lista', width="70%")),
+                tabPanel("Wszystkie kategorie", dataTableOutput ('kategorie_lista', width="30%")),
                 
               )
             )
@@ -116,6 +120,7 @@ ui <- tagList(
               theme = shinytheme("flatly"),
               tabsetPanel(
                 tabPanel("Cały sprzęt", dataTableOutput ('sprzet_lista', width="70%")),
+                tabPanel("Top sprzęt", dataTableOutput('top_sprzet_lista', width="40%")),
                 
               )
             )
@@ -124,7 +129,7 @@ ui <- tagList(
             fluidPage(
               theme = shinytheme("flatly"),
               tabsetPanel(
-                tabPanel("Wszystkie ceny i kary", dataTableOutput ('cennik_lista', width="70%")),
+                tabPanel("Wszystkie ceny i kary", dataTableOutput ('cennik_lista', width="50%")),
                 
               )
             )
@@ -154,7 +159,9 @@ ui <- tagList(
 )
 
 server <- shinyServer(function(input, output, session){
-  # tabele do wyświetlenia
+  
+  # RENDERY do datatable do wyświetlenia
+  # Główne tabele
   output$lokacje_lista <- renderDataTable( dbGetQuery(con, "SELECT id_lokacji, nazwa_lokacji,
                                                   miasto, ulica, nr_posesji FROM lokacje order by 1"))
   output$pracownicy_lista = renderDataTable(pracownicy)
@@ -164,10 +171,14 @@ server <- shinyServer(function(input, output, session){
   output$cennik_lista = renderDataTable(cennik)
   output$klienci_lista = renderDataTable(klienci)
   output$rejestr_lista = DT::renderDataTable({datatable(rejestr) %>% formatDate(4:6, "toLocaleString")})
+  
+  # Widoki
+  output$top_lokacje_lista = renderDataTable(top_lokacje)
+  output$top_sprzet_lista = renderDataTable(top_sprzet)
 
-
-  #guziki lokacje
-  #dodaj lokacje
+  # GUZIKI
+  # lokacje
+  # dodaj lokacje
   observeEvent(input$dodaj_lokacje, {
   
     res <- dbSendStatement(con, paste0("select dodaj_lokacje(","'",input$lokacja_dodanie_nazwa,"'", ",", "'",
