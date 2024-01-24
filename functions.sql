@@ -130,6 +130,46 @@ END;
 $$ LANGUAGE 'plpgsql'; 
 
 
+/* cennik */
+CREATE OR REPLACE FUNCTION dodaj_cene(cena_arg DECIMAL(7,2), kara_arg DECIMAL(7,2), id_lokacji_arg INTEGER, id_kategorii_arg INTEGER)
+RETURNS TEXT AS $$
+DECLARE
+    czy_lokacja_istnieje BOOLEAN;
+    czy_kategoria_istnieje BOOLEAN;
+    czy_cena_istnieje BOOLEAN;
+BEGIN
+
+    SELECT count(1) > 0 INTO czy_lokacja_istnieje FROM lokacje WHERE id_lokacji = id_lokacji_arg;
+    SELECT count(1) > 0 INTO czy_kategoria_istnieje FROM kategorie WHERE id_kategorii = id_kategorii_arg;
+    SELECT count(1) > 0 INTO czy_cena_istnieje FROM cennik 
+    WHERE id_kategorii = id_kategorii_arg and id_lokacji = id_lokacji_arg;
+
+
+	IF not czy_lokacja_istnieje THEN
+        RETURN 'Nie istnieje lokacja o podanym ID!';
+    END IF;
+    
+    IF not czy_kategoria_istnieje THEN
+        RETURN 'Nie istnieje kategoria o podanym ID!';
+    END IF;
+    
+    if czy_cena_istnieje THEN
+    	return 'Istnieje juz cena dla podanej kategorii i lokacji.';
+    end if;
+    
+    /* sprawdzmy, czy uzytkownik wpisał null */
+    if (cena_arg IS NULL or kara_arg IS NULL) THEN
+    	return 'Cena i kara musza przyjmowac wartosci inne niz null!';
+    end if;
+
+
+    INSERT INTO cennik (cena, kara, id_lokacji, id_kategorii) VALUES 
+    (cena_arg, kara_arg, id_lokacji_arg, id_kategorii_arg);
+    RETURN 'Cena dodana poprawnie!';
+END;
+$$ LANGUAGE 'plpgsql'; 
+
+
 
 /* klienci */
 CREATE OR REPLACE FUNCTION dodaj_klienta(imie_arg VARCHAR(50), nazwisko_arg VARCHAR(50), 
