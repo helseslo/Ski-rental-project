@@ -1,5 +1,48 @@
+/* FUNKCJE DODAJ */
 
-/*DROP FUNCTION pracownicy_dla_lokacji (INTEGER);*/
+/* lokacje*/
+CREATE OR REPLACE FUNCTION dodaj_lokacje(nazwa_lokacji_arg VARCHAR(50), miasto_arg VARCHAR(50), ulica_arg VARCHAR(50),nr_posesji_arg INTEGER)
+RETURNS TEXT AS $$
+DECLARE
+    czy_lokacja_istnieje BOOLEAN;
+BEGIN
+
+    SELECT count(1) > 0 INTO czy_lokacja_istnieje FROM lokacje WHERE nazwa_lokacji = nazwa_lokacji_arg;
+
+
+	IF czy_lokacja_istnieje THEN
+        RETURN 'Istnieje juz lokacja o podanej nazwie!';
+    END IF;
+
+
+    INSERT INTO lokacje (nazwa_lokacji, miasto, ulica, nr_posesji) VALUES 
+    (nazwa_lokacji_arg, miasto_arg, ulica_arg, nr_posesji_arg);
+    RETURN 'Lokacja dodana poprawnie!';
+END;
+$$ LANGUAGE 'plpgsql'; 
+
+
+CREATE OR REPLACE FUNCTION dodaj_stanowisko(nazwa_stanowiska_arg VARCHAR(50))
+RETURNS TEXT AS $$
+DECLARE
+    czy_stanowisko_istnieje BOOLEAN;
+BEGIN
+
+    SELECT count(1) > 0 INTO czy_stanowisko_istnieje FROM stanowiska WHERE nazwa_stanowiska = nazwa_stanowiska_arg;
+
+
+	IF czy_stanowisko_istnieje THEN
+        RAISE EXCEPTION 'Istnieje juz stanowisko o podanej nazwie!';
+    END IF;
+
+
+    INSERT INTO stanowiska (nazwa_stanowiska) VALUES 
+    (nazwa_stanowiska_arg);
+    RETURN 'Stanowisko dodane poprawnie!';
+END;
+$$ LANGUAGE 'plpgsql'; 
+
+
 
 
 
@@ -505,23 +548,7 @@ BEGIN
  end;
  $$ LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION dodaj_lokacje(nazwa_lokacji_arg VARCHAR(50), miasto_arg VARCHAR(50), ulica_arg VARCHAR(50),nr_posesji_arg INTEGER)
-RETURNS TEXT AS $$
-DECLARE
-    czy_lokacja_istnieje BOOLEAN;
-BEGIN
-
-    SELECT count(1) > 0 INTO czy_lokacja_istnieje FROM lokacje WHERE nazwa_lokacji = nazwa_lokacji_arg;
 
 
-	IF czy_lokacja_istnieje THEN
-        RAISE EXCEPTION 'Istnieje juz lokacja o podanej nazwie!';
-    END IF;
 
-
-    INSERT INTO lokacje (nazwa_lokacji, miasto, ulica, nr_posesji) VALUES 
-    (nazwa_lokacji_arg, miasto_arg, ulica_arg, nr_posesji_arg);
-    RETURN 'Lokacja dodana poprawnie!';
-END;
-$$ LANGUAGE 'plpgsql'; 
-
+/* WYZWALACZE */
