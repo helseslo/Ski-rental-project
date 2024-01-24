@@ -133,6 +133,9 @@ ui <- tagList(
               theme = shinytheme("flatly"),
               tabsetPanel(
                 tabPanel("Wszystkie kategorie", dataTableOutput ('kategorie_lista', width="30%")),
+                tabPanel("Dodaj kategorię",
+                         textInput("kategoria_dodanie_nazwa","Podaj nazwę", value=""),
+                         actionButton("dodaj_kategorie","Dodaj kategorię")),
                 
               )
             )
@@ -243,6 +246,17 @@ server <- shinyServer(function(input, output, session){
     data <- dbFetch(res)
     updateTextInput(session,'stanowisko_dodanie_nazwa', value="")
     output$stanowiska_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM stanowiska order by 1"))
+    shinyalert(print(data[1,1]), type = "info")
+  })
+  
+  # kategorie
+  # dodaj kategorię
+  observeEvent(input$dodaj_kategorie, {
+    
+    res <- dbSendStatement(con, paste0("select dodaj_kategorie(","'",input$kategoria_dodanie_nazwa,"'", ")"))
+    data <- dbFetch(res)
+    updateTextInput(session,'kategoria_dodanie_nazwa', value="")
+    output$kategorie_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM kategorie order by 1"))
     shinyalert(print(data[1,1]), type = "info")
   })
   
