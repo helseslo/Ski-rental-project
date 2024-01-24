@@ -26,6 +26,7 @@ END;
 $$ LANGUAGE 'plpgsql'; 
 
 
+/* stanowiska */
 CREATE OR REPLACE FUNCTION dodaj_stanowisko(nazwa_stanowiska_arg VARCHAR(50))
 RETURNS TEXT AS $$
 DECLARE
@@ -47,6 +48,7 @@ END;
 $$ LANGUAGE 'plpgsql'; 
 
 
+/* pracownicy */
 CREATE OR REPLACE FUNCTION dodaj_pracownika(imie_arg VARCHAR(50), nazwisko_arg VARCHAR(50), 
                                       id_lokacji_arg INTEGER, id_stanowiska_arg INTEGER)
 RETURNS TEXT AS $$
@@ -75,7 +77,7 @@ END;
 $$ LANGUAGE 'plpgsql'; 
 
 
-
+/* kategorie */
 create or replace function dodaj_kategorie(nazwa_kategorii_arg VARCHAR(50)) 
 returns text as $$
 DECLARE
@@ -97,7 +99,7 @@ $$ LANGUAGE 'plpgsql';
 
 
 
-
+/* sprzęt */
 create or replace function dodaj_sprzet(id_kategorii_arg INTEGER, rozmiar_arg INTEGER, firma_arg VARCHAR(50),
                                        id_lokacji_arg INTEGER) 
 returns text as $$
@@ -129,7 +131,7 @@ $$ LANGUAGE 'plpgsql';
 
 
 
-
+/* klienci */
 CREATE OR REPLACE FUNCTION dodaj_klienta(imie_arg VARCHAR(50), nazwisko_arg VARCHAR(50), 
                  nr_telefonu_arg VARCHAR(9),nr_dowodu_arg VARCHAR(8), pesel_arg VARCHAR(11))
 RETURNS TEXT AS $$
