@@ -168,5 +168,6 @@ INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, pod
 INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, podstawowy_koszt) VALUES (1, 9, '2024-01-01 12:00:00', '2024-01-02 11:00:00', 1);
 INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, podstawowy_koszt) VALUES (2, 1, '2024-01-03 14:00:00', '2024-01-04 12:00:00', 1);
 INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, podstawowy_koszt) VALUES (2, 9, '2024-01-03 10:00:00', '2024-01-04 9:00:00', 1);
-INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, podstawowy_koszt, naliczona_kara) VALUES (3, 6, '2024-01-01 10:00:00', '2024-01-03 10:00:00', 50, 50);
+INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, podstawowy_koszt, naliczona_kara) VALUES (3, 6, '2024-01-01 10:00:00', '2024-01-03 10:00:00', 50, 100);
 
+INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, podstawowy_koszt, czy_aktualne) VALUES (3, 7, '2024-01-10 10:00:00', '2024-02-03 10:00:00', 50, TRUE);
