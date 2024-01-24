@@ -18,6 +18,7 @@ con <- dbConnect(RPostgres::Postgres(),
                  user = 'hela', # nasza nazwa u�ytkownika psql
                  password = 'hela') # i nasze has�o tego u�ytkownika
 
+# obiekty do rendertable do outputu w sekcji serwer
 lokacje <- dbGetQuery(con, "SELECT * FROM lokacje")
 pracownicy <- dbGetQuery(con, "SELECT * FROM pracownicy")
 stanowiska <- dbGetQuery(con, "SELECT * FROM stanowiska")
@@ -72,25 +73,41 @@ ui <- dashboardPage(
                          )
               )
     ),
-    tabItem(tabName="stanowiska",
+    tabItem(tabName="stanowiska", h2("Stanowiska"),
               fluidPage(
-                theme = shinytheme("flatly")
+                theme = shinytheme("flatly"),
+                tabsetPanel(
+                  tabPanel("Wszystkie stanowiska", tableOutput ('stanowiska_lista')),
+                  
+                )
               )
     ),
-    tabItem(tabName="kategorie",
-              fluidPage(
-                theme = shinytheme("flatly")
+    tabItem(tabName="kategorie", h2("Kategorie"),
+            fluidPage(
+              theme = shinytheme("flatly"),
+              tabsetPanel(
+                tabPanel("Wszystkie kategorie", tableOutput ('kategorie_lista')),
+                
               )
+            )
     ),
-    tabItem(tabName="sprzet",
-              fluidPage(
-                theme = shinytheme("flatly")
+    tabItem(tabName="sprzet", h2("Sprzęt"),
+            fluidPage(
+              theme = shinytheme("flatly"),
+              tabsetPanel(
+                tabPanel("Cały sprzęt", tableOutput ('sprzet_lista')),
+                
               )
+            )
     ),
-    tabItem(tabName="cennik",
-              fluidPage(
-                theme = shinytheme("flatly")
+    tabItem(tabName="cennik", h2("Cennik"),
+            fluidPage(
+              theme = shinytheme("flatly"),
+              tabsetPanel(
+                tabPanel("Wszystkie ceny i kary", tableOutput ('cennik_lista')),
+                
               )
+            )
     ),
     tabItem(tabName="klienci",
               fluidPage(
@@ -107,9 +124,14 @@ ui <- dashboardPage(
 )
 
 server <- shinyServer(function(input, output, session){
+  # tabele do wyświetlenia
   output$lokacje_lista <- renderTable( dbGetQuery(con, "SELECT id_lokacji, nazwa_lokacji,
                                                   miasto, ulica, nr_posesji FROM lokacje order by 1"), align = "l", width = "100%")
   output$pracownicy_lista = renderTable( pracownicy, align = "l", width = "100%")
+  output$stanowiska_lista = renderTable(stanowiska, align = "l", width = "100%")
+  output$kategorie_lista = renderTable(kategorie, align = "l", width = "100%")
+  output$sprzet_lista = renderTable(sprzet, align = "l", width = "100%")
+  output$cennik_lista = renderTable(cennik, align = "l", width = "100%")
 
 
   #guziki lokacje

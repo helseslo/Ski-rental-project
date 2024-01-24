@@ -56,7 +56,7 @@ CREATE TABLE sprzet (
 
 CREATE TABLE cennik (
     cena DECIMAL(7,2) NOT NULL CHECK (cena > 0),
-    kara DECIMAL(7,2) NOT NULL CHECK (kara > 0),
+    kara DECIMAL(7,2) DEFAULT(1000) NOT NULL CHECK (kara > 0),
     id_lokacji INTEGER REFERENCES lokacje(id_lokacji) ON DELETE CASCADE ON UPDATE CASCADE,
     id_kategorii INTEGER REFERENCES kategorie(id_kategorii) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -146,17 +146,17 @@ INSERT INTO sprzet (id_kategorii, rozmiar, firma, id_lokacji) VALUES (4, 3, 'Naw
 
 /* Inserty - cennik */
 /* narty */
-INSERT INTO cennik (cena, id_lokacji, id_kategorii) VALUES (50, 1, 1);
-INSERT INTO cennik (cena, id_lokacji, id_kategorii) VALUES (60, 2, 1);
+INSERT INTO cennik (cena, kara, id_lokacji, id_kategorii) VALUES (50, 100, 1, 1);
+INSERT INTO cennik (cena, kara, id_lokacji, id_kategorii) VALUES (60, 120, 2, 1);
 /*kije*/
-INSERT INTO cennik (cena, id_lokacji, id_kategorii) VALUES (5, 1, 2);
-INSERT INTO cennik (cena, id_lokacji, id_kategorii) VALUES (6, 2, 2);
+INSERT INTO cennik (cena, kara, id_lokacji, id_kategorii) VALUES (5, 10, 1, 2);
+INSERT INTO cennik (cena, kara, id_lokacji, id_kategorii) VALUES (6, 12, 2, 2);
 /*kaski*/
-INSERT INTO cennik (cena, id_lokacji, id_kategorii) VALUES (5, 1, 3);
-INSERT INTO cennik (cena, id_lokacji, id_kategorii) VALUES (6, 2, 3);
+INSERT INTO cennik (cena, kara, id_lokacji, id_kategorii) VALUES (5, 10, 1, 3);
+INSERT INTO cennik (cena, kara, id_lokacji, id_kategorii) VALUES (6, 12, 2, 3);
 /*buty*/
-INSERT INTO cennik (cena, id_lokacji, id_kategorii) VALUES (5, 1, 4);
-INSERT INTO cennik (cena, id_lokacji, id_kategorii) VALUES (6, 2, 4);
+INSERT INTO cennik (cena, kara, id_lokacji, id_kategorii) VALUES (5, 10, 1, 4);
+INSERT INTO cennik (cena, kara, id_lokacji, id_kategorii) VALUES (6, 12, 2, 4);
 
 /* Inserty - klienci */
 INSERT INTO klienci (imie, nazwisko, nr_telefonu, nr_dowodu, PESEL) VALUES ('Jurgen', 'Stokonen', 000000000, '123A', 01119911188);
