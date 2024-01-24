@@ -499,7 +499,7 @@ BEGIN
     /* w tabeli sprzęt musimy zmienić atrybut 'stan_wypozyczenia' dla sprzętu, który został oddany */
     update sprzet set stan_wypozyczenia = 'f'
     where id_sprzetu = nr_sprzetu;
-    
+
     return 'Zwrot dodany poprawnie!';
     
  end;
