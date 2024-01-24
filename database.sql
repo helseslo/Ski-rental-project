@@ -117,7 +117,7 @@ INSERT INTO sprzet (id_kategorii, rozmiar, firma, id_lokacji) VALUES (1, 2, 'Nar
 INSERT INTO sprzet (id_kategorii, rozmiar, firma, id_lokacji) VALUES (1, 1, 'Sliska sprawa', 1);
 INSERT INTO sprzet (id_kategorii, rozmiar, firma, id_lokacji) VALUES (1, 1, 'Narty znad Warty', 1);
 INSERT INTO sprzet (id_kategorii, rozmiar, firma, id_lokacji) VALUES (1, 1, 'Sliska sprawa', 2);
-INSERT INTO sprzet (id_kategorii, rozmiar, firma, id_lokacji) VALUES (1, 2, 'Narty znad Warty', 2);
+INSERT INTO sprzet (id_kategorii, rozmiar, firma, stan_wypozyczenia, id_lokacji) VALUES (1, 2, 'Narty znad Warty', 1, 2);
 INSERT INTO sprzet (id_kategorii, rozmiar, firma, id_lokacji) VALUES (1, 3, 'Narty znad Warty', 2);
 /* kije */
 INSERT INTO sprzet (id_kategorii, rozmiar, firma, id_lokacji) VALUES (2, 1, 'Kije samobije', 1);
