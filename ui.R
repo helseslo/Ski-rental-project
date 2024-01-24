@@ -34,6 +34,10 @@ rejestr <- dbGetQuery(con, "SELECT * FROM rejestr")
 # Widoki
 top_lokacje <- dbGetQuery(con, "SELECT * FROM top_lokacje")
 top_sprzet <- dbGetQuery(con, "SELECT * FROM top_sprzet")
+narty <- dbGetQuery(con, "SELECT * FROM sprzet WHERE id_kategorii=1")
+kije <- dbGetQuery(con, "SELECT * FROM sprzet WHERE id_kategorii=2")
+kaski <- dbGetQuery(con, "SELECT * FROM sprzet WHERE id_kategorii=3")
+buty <- dbGetQuery(con, "SELECT * FROM sprzet WHERE id_kategorii=4")
 
 
 # zaczynamy UI, czyli to, co widać :)
@@ -146,6 +150,10 @@ ui <- tagList(
               theme = shinytheme("flatly"),
               tabsetPanel(
                 tabPanel("Cały sprzęt", dataTableOutput ('sprzet_lista', width="70%")),
+                tabPanel("Narty", dataTableOutput('narty_lista', width="70%")),
+                tabPanel("Kije", dataTableOutput('kije_lista', width="70%")),
+                tabPanel("Kaski", dataTableOutput('kaski_lista', width="70%")),
+                tabPanel("Buty", dataTableOutput('buty_lista', width="70%")),
                 tabPanel("Dodaj sprzęt",
                          selectInput('sprzet_dodanie_id_kategorii', 'Wybierz id kategorii', choices =c(" ",dbGetQuery(con, "SELECT id_kategorii FROM kategorie order by 1"))),
                          textInput("sprzet_dodanie_rozmiar","Podaj rozmiar", value=""),
@@ -153,6 +161,7 @@ ui <- tagList(
                          selectInput('sprzet_dodanie_id_lokacji', 'Wybierz id lokacji', choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1"))),
                          actionButton("dodaj_sprzet","Dodaj sprzęt")),
                 tabPanel("Top sprzęt", dataTableOutput('top_sprzet_lista', width="40%")),
+                
                 
               )
             )
@@ -222,6 +231,12 @@ server <- shinyServer(function(input, output, session){
   # Widoki
   output$top_lokacje_lista = renderDataTable(top_lokacje)
   output$top_sprzet_lista = renderDataTable(top_sprzet)
+  
+  # Tabele częściowe, ale zbyt mało zaawansowane, żeby to był widok
+  output$narty_lista = renderDataTable(narty)
+  output$kije_lista = renderDataTable(kije)
+  output$kaski_lista = renderDataTable(kaski)
+  output$buty_lista = renderDataTable(buty)
 
   # GUZIKI
   # lokacje
@@ -239,6 +254,7 @@ server <- shinyServer(function(input, output, session){
     updateTextInput(session,'lokacja_dodanie_nr', value="")
     output$lokacje_lista <- renderDataTable( dbGetQuery(con, "SELECT id_lokacji, nazwa_lokacji,
                                                   miasto, ulica, nr_posesji FROM lokacje order by 1"))
+    output$top_lokacje_lista = renderDataTable(top_lokacje)
     shinyalert(print(data[1,1]), type = "info")
   })
   
@@ -296,6 +312,10 @@ server <- shinyServer(function(input, output, session){
     updateTextInput(session,'sprzet_dodanie_firma', value="")
     updateSelectInput(session, 'sprzet_dodanie_id_lokacji', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1")), selected = NULL)
     output$sprzet_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM sprzet order by 1"))
+    output$kije_lista = renderDataTable(kije)
+    output$kaski_lista = renderDataTable(kaski)
+    output$buty_lista = renderDataTable(buty)
+    output$narty_lista = renderDataTable(narty)
     shinyalert(print(data[1,1]), type = "info")
   })
   
