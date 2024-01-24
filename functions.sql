@@ -14,6 +14,10 @@ BEGIN
         RETURN 'Istnieje juz lokacja o podanej nazwie!';
     END IF;
 
+	IF nazwa_lokacji_arg IS NULL THEN
+		RETURN 'Nazwa lokacji nie moze przyjmowac wartosci NULL!';
+	END IF;
+
 
     INSERT INTO lokacje (nazwa_lokacji, miasto, ulica, nr_posesji) VALUES 
     (nazwa_lokacji_arg, miasto_arg, ulica_arg, nr_posesji_arg);
