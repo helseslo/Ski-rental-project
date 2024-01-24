@@ -30,6 +30,7 @@ sprzet <- dbGetQuery(con, "SELECT * FROM sprzet")
 cennik <- dbGetQuery(con, "SELECT * FROM cennik")
 klienci <- dbGetQuery(con, "SELECT * FROM klienci")
 rejestr <- dbGetQuery(con, "SELECT * FROM rejestr")
+
 # Widoki
 top_lokacje <- dbGetQuery(con, "SELECT * FROM top_lokacje")
 top_sprzet <- dbGetQuery(con, "SELECT * FROM top_sprzet")
@@ -209,7 +210,14 @@ server <- shinyServer(function(input, output, session){
   output$sprzet_lista = renderDataTable(sprzet)
   output$cennik_lista = renderDataTable(cennik)
   output$klienci_lista = renderDataTable(klienci)
-  output$rejestr_lista = DT::renderDataTable({datatable(rejestr) %>% formatDate(4:6, "toLocaleString")})
+  output$rejestr_lista = DT::renderDataTable({datatable(rejestr) %>% formatDate(4:6, method =  "toLocaleDateString", 
+                                                                                params = list(
+                                                                                  'en-ca', 
+                                                                                  list(
+                                                                                    year = 'numeric', 
+                                                                                    month = 'numeric',
+                                                                                    day = 'numeric')
+                                                                                ))})
   
   # Widoki
   output$top_lokacje_lista = renderDataTable(top_lokacje)
