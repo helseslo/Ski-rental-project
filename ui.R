@@ -67,9 +67,9 @@ ui <- dashboardPage(
     tabItem(tabName="pracownicy", h2("Pracownicy"),
               fluidPage(theme = shinytheme("flatly"),
                          tabsetPanel(
-                           tabPanel("Wszyscy pracownicy", tableOutput ('pracownicy_lista'))
+                           tabPanel("Wszyscy pracownicy", tableOutput ('pracownicy_lista')),
                            
-                
+                         )
               )
     ),
     tabItem(tabName="stanowiska",
