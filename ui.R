@@ -33,7 +33,7 @@ rejestr <- dbGetQuery(con, "SELECT * FROM rejestr")
 
 ui <- dashboardPage(
   skin = 'black',
-  dashboardHeader(title = "Właściciel"),
+  dashboardHeader(title = "Wypożyczalnia sprzętu narciarskiego \"PANDA 3\"",titleWidth = 450),
   dashboardSidebar(
     sidebarMenu(
       menuItem('Lokacje', tabName="lokacje", icon=icon("house")),
@@ -56,78 +56,57 @@ ui <- dashboardPage(
                                    textInput("lokacja_dodanie_miasto","Podaj miasto", value=""),
                                    textInput("lokacja_dodanie_ulica","Podaj ulicę", value=""),
                                    textInput("lokacja_dodanie_nr","Podaj numer posesji", value=""),
-                                   actionButton("dodaj_lokacje","Dodaj lokację"), actionButton("lokacja_wyczysc1","Wyczyść")),
-
-                          
-
+                                   actionButton("dodaj_lokacje","Dodaj lokację")),
                         )
-                          
-                        )
+                    )
+              ),
+
+      
+      
+    tabItem(tabName="pracownicy", h2("Pracownicy"),
+              fluidPage(
+                
               )
-      ),
-
-      
-      
-      
-    tabItems(
-      tabItem(tabName="pracownicy",
-              fluidPage(
-                theme = shinytheme("flatly")
-              ))
     ),
-    tabItems(
-      tabItem(tabName="stanowiska",
+    tabItem(tabName="stanowiska",
               fluidPage(
                 theme = shinytheme("flatly")
-              ))
+              )
     ),
-    tabItems(
-      tabItem(tabName="kategorie",
+    tabItem(tabName="kategorie",
               fluidPage(
                 theme = shinytheme("flatly")
-              ))
+              )
     ),
-    tabItems(
-      tabItem(tabName="sprzet",
+    tabItem(tabName="sprzet",
               fluidPage(
                 theme = shinytheme("flatly")
-              ))
+              )
     ),
-    tabItems(
-      tabItem(tabName="cennik",
+    tabItem(tabName="cennik",
               fluidPage(
                 theme = shinytheme("flatly")
-              ))
+              )
     ),
-    tabItems(
-      tabItem(tabName="klienci",
+    tabItem(tabName="klienci",
               fluidPage(
                 theme = shinytheme("flatly")
-              ))
+              )
     ),
-    tabItems(
-      tabItem(tabName="rejestr",
+    tabItem(tabName="rejestr",
               fluidPage(
                 theme = shinytheme("flatly")
-              ))
+              )
     )
     )
-  
+  )
 )
 
 server <- shinyServer(function(input, output, session){
   output$lokacje_lista <- renderTable( dbGetQuery(con, "SELECT id_lokacji, nazwa_lokacji,
                                                   miasto, ulica, nr_posesji FROM lokacje order by 1"), align = "l", width = "100%")
-  #ponizej kody do guzikow wyczysc
-  #lokacje
-  observeEvent(input$lok_wyczysc1, {
-    updateTextInput(session,"lokacja_dodanie_nazwa", value="")
-    updateTextInput(session,"lokacja_dodanie_miasto", value="")
-    updateTextInput(session,"lokacja_dodanie_ulica", value="")
-    updateTextInput(session,"lokacja_dodanie_nr", value="")
-  })
 
-  
+
   #guziki lokacje
   #dodaj lokacje
   observeEvent(input$dodaj_lokacje, {

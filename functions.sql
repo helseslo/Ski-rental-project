@@ -1,5 +1,5 @@
 
-DROP FUNCTION pracownicy_dla_lokacji (INTEGER);
+/*DROP FUNCTION pracownicy_dla_lokacji (INTEGER);*/
 
 
 
@@ -71,7 +71,7 @@ BEGIN
     END IF;
 
     IF (nazwa_obecnej_lokacji_sprzetu = nazwa_nowej_lokacji_sprzetu) THEN
-        RAISE EXCEPTION 'Sprzet juz jest w danej lokacji!';
+        RETURN 'Sprzet juz jest w danej lokacji!';
     END IF;
 
     SELECT id_lokacji INTO id_nowej_lokacji_sprzetu FROM lokacje WHERE nazwa_lokacji=nazwa_nowej_lokacji_sprzetu;
@@ -505,7 +505,7 @@ BEGIN
  end;
  $$ LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION dodaj_lokacje(nazwa_lokacji_arg VARCHAR(50), miasto_arg VARCHAR(50), ulica_arg VARCHAR(50),nr_posesji_arg VARCHAR(50))
+CREATE OR REPLACE FUNCTION dodaj_lokacje(nazwa_lokacji_arg VARCHAR(50), miasto_arg VARCHAR(50), ulica_arg VARCHAR(50),nr_posesji_arg INTEGER)
 RETURNS TEXT AS $$
 DECLARE
     czy_lokacja_istnieje BOOLEAN;
