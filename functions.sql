@@ -125,7 +125,7 @@ BEGIN
 
     INSERT INTO sprzet (id_kategorii, rozmiar, firma, id_lokacji) VALUES 
     (id_kategorii_arg, rozmiar_arg, firma_arg, id_lokacji_arg);
-    RETURN 'Sprzet dodany poprawnie!';
+    RETURN 'Sprzęt dodany poprawnie!';
 END;
 $$ LANGUAGE 'plpgsql'; 
 
