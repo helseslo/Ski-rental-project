@@ -76,7 +76,8 @@ ui <- tagList(
                         height = '100%',
                         tabsetPanel(
                           tabPanel("Wszystkie lokacje", dataTableOutput('lokacje_lista', width="60%")),
-                          tabPanel("Utwórz lokację",textInput("lokacja_dodanie_nazwa","Podaj nazwę lokacji", value=""),
+                          tabPanel("Utwórz lokację",
+                                   textInput("lokacja_dodanie_nazwa","Podaj nazwę lokacji", value=""),
                                    textInput("lokacja_dodanie_miasto","Podaj miasto", value=""),
                                    textInput("lokacja_dodanie_ulica","Podaj ulicę", value=""),
                                    textInput("lokacja_dodanie_nr","Podaj numer posesji", value=""),
@@ -93,6 +94,12 @@ ui <- tagList(
               fluidPage(theme = shinytheme("flatly"),
                          tabsetPanel(
                            tabPanel("Wszyscy pracownicy", dataTableOutput ('pracownicy_lista', width="50%")),
+                           tabPanel("Dodaj pracownika",
+                                    textInput("pracownik_dodanie_imie","Podaj imię", value=""),
+                                    textInput("pracownik_dodanie_nazwisko","Podaj nazwisko", value=""),
+                                    selectInput('pracownik_dodanie_id_lokacji', 'Wybierz id lokacji', choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1"))),
+                                    selectInput('pracownik_dodanie_id_stanowiska', 'Wybierz id stanowiska', choices =c(" ",dbGetQuery(con, "SELECT id_stanowiska FROM stanowiska order by 1"))),
+                                    actionButton("dodaj_pracownika","Dodaj pracownika")),
                            
                          )
               )
@@ -190,8 +197,26 @@ server <- shinyServer(function(input, output, session){
     updateTextInput(session,"lokacja_dodanie_miasto", value="")
     updateTextInput(session,"lokacja_dodanie_ulica", value="")
     updateTextInput(session,"lokacja_dodanie_nr", value="")
-    output$lokacje_lista <- renderTable( dbGetQuery(con, "SELECT id_lokacji, nazwa_lokacji,
-                                                  miasto, ulica, nr_posesji FROM lokacje order by 1"), align = "l", width = "100%")
+    output$lokacje_lista <- renderDataTable( dbGetQuery(con, "SELECT id_lokacji, nazwa_lokacji,
+                                                  miasto, ulica, nr_posesji FROM lokacje order by 1"))
+    shinyalert(print(data[1,1]), type = "info")
+  })
+  
+  # pracownicy
+  # dodaj pracownika
+  observeEvent(input$dodaj_pracownika, {
+    
+    res <- dbSendStatement(con, paste0("select dodaj_pracownika(","'",input$pracownik_dodanie_imie,"'", ",", "'",
+                                       input$pracownik_dodanie_nazwisko,"'", ",", "'",
+                                       input$pracownik_dodanie_id_lokacji, "'",",", "'",
+                                       input$pracownik_dodanie_id_stanowiska, "'", ")"))
+    data <- dbFetch(res)
+    updateTextInput(session,"pracownik_dodanie_imie", value="")
+    updateTextInput(session,"pracownik_dodanie_nazwisko", value="")
+    updateSelectInput(session, 'pracownik_dodanie_id_lokacji', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1")), selected = NULL)
+    updateSelectInput(session, 'pracownik_dodanie_id_stanowiska', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_stanowiska FROM stanowiska order by 1")), selected = NULL)
+    output$pracownicy_lista <- renderDataTable( dbGetQuery(con, "SELECT id_pracownika, imie,
+                                                  nazwisko, id_lokacji, id_stanowiska FROM pracownicy order by 1"))
     shinyalert(print(data[1,1]), type = "info")
   })
   
