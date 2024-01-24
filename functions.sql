@@ -43,6 +43,33 @@ END;
 $$ LANGUAGE 'plpgsql'; 
 
 
+CREATE OR REPLACE FUNCTION dodaj_pracownika(imie_arg VARCHAR(50), nazwisko_arg VARCHAR(50), 
+                                      id_lokacji_arg INTEGER, id_stanowiska_arg INTEGER)
+RETURNS TEXT AS $$
+DECLARE
+	czy_istnieje_lokacja BOOLEAN;
+    	czy_istnieje_stanowisko BOOLEAN;
+BEGIN
+
+	SELECT count(1) > 0 INTO czy_istnieje_lokacja FROM lokacje WHERE id_lokacji = id_lokacji_arg;
+	SELECT count(1) > 0 INTO czy_istnieje_stanowisko FROM stanowiska WHERE id_stanowiska = id_stanowiska_arg;
+
+
+	if not czy_istnieje_lokacja THEN
+    		return 'Nie istnieje lokacja o podanym ID!';
+    	end if;
+
+	if not czy_istnieje_stanowisko THEN
+    		return 'Nie istnieje stanowisko o podanym ID!';
+    	end if;
+
+
+    	INSERT INTO pracownicy (imie, nazwisko, id_lokacji, id_stanowiska) VALUES 
+    	(imie_arg, nazwisko_arg, id_lokacji_arg, id_stanowiska_arg);
+    	RETURN 'Pracownik dodany poprawnie!';
+END;
+$$ LANGUAGE 'plpgsql'; 
+
 
 
 CREATE OR REPLACE FUNCTION dodaj_klienta(imie_arg VARCHAR(50), nazwisko_arg VARCHAR(50), 
@@ -79,33 +106,6 @@ END;
 $$ LANGUAGE 'plpgsql'; 
 
 
-
-CREATE OR REPLACE FUNCTION dodaj_pracownika(imie_arg VARCHAR(50), nazwisko_arg VARCHAR(50), 
-                                      id_lokacji_arg INTEGER, id_stanowiska_arg INTEGER)
-RETURNS TEXT AS $$
-DECLARE
-	czy_istnieje_lokacja BOOLEAN;
-    	czy_istnieje_stanowisko BOOLEAN;
-BEGIN
-
-	SELECT count(1) > 0 INTO czy_istnieje_lokacja FROM lokacje WHERE id_lokacji = id_lokacji_arg;
-	SELECT count(1) > 0 INTO czy_istnieje_stanowisko FROM stanowiska WHERE id_stanowiska = id_stanowiska_arg;
-
-
-	if not czy_istnieje_lokacja THEN
-    		return 'Nie istnieje lokacja o podanym ID!';
-    	end if;
-
-	if not czy_istnieje_stanowisko THEN
-    		return 'Nie istnieje stanowisko o podanym ID!';
-    	end if;
-
-
-    	INSERT INTO pracownicy (imie, nazwisko, id_lokacji, id_stanowiska) VALUES 
-    	(imie_arg, nazwisko_arg, id_lokacji_arg, id_stanowiska_arg);
-    	RETURN 'Pracownik dodany poprawnie!';
-END;
-$$ LANGUAGE 'plpgsql'; 
 
 
 
