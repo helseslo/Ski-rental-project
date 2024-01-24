@@ -131,7 +131,8 @@ $$ LANGUAGE 'plpgsql';
 
 
 /* cennik */
-CREATE OR REPLACE FUNCTION dodaj_cene(cena_arg DECIMAL(7,2), kara_arg DECIMAL(7,2), id_lokacji_arg INTEGER, id_kategorii_arg INTEGER)
+CREATE OR REPLACE FUNCTION dodaj_cene(cena_arg DECIMAL(7,2), naliczona_kara_arg DECIMAL(7,2), 
+					id_lokacji_arg INTEGER, id_kategorii_arg INTEGER)
 RETURNS TEXT AS $$
 DECLARE
     czy_lokacja_istnieje BOOLEAN;
@@ -158,13 +159,13 @@ BEGIN
     end if;
     
     /* sprawdzmy, czy uzytkownik wpisał null */
-    if (cena_arg IS NULL or kara_arg IS NULL) THEN
+    if (cena_arg IS NULL or naliczona_kara_arg IS NULL) THEN
     	return 'Cena i kara musza przyjmowac wartosci inne niz null!';
     end if;
 
 
-    INSERT INTO cennik (cena, kara, id_lokacji, id_kategorii) VALUES 
-    (cena_arg, kara_arg, id_lokacji_arg, id_kategorii_arg);
+    INSERT INTO cennik (cena, naliczona_kara, id_lokacji, id_kategorii) VALUES 
+    (cena_arg, naliczona_kara_arg, id_lokacji_arg, id_kategorii_arg);
     RETURN 'Cena dodana poprawnie!';
 END;
 $$ LANGUAGE 'plpgsql'; 
@@ -444,7 +445,7 @@ order by ilosc_wypozyczen DESC, sprzet.id_sprzetu;
 
 
 /* Funkcja zmieniająca cenę i karę w cenniku dla podanej lokacji i kategorii */
-create or replace function zmien_cennik (nowa_cena DECIMAL(7,2), nowa_kara DECIMAL(7,2),
+create or replace function zmien_cennik (nowa_cena DECIMAL(7,2), nowa_naliczona_kara DECIMAL(7,2),
                                          moje_id_lokacji INTEGER, moje_id_kategorii INTEGER)
 returns TEXT as $$
 DECLARE
@@ -471,21 +472,67 @@ BEGIN
         return 'W cenniku nie ma ceny dla podanej lokacji i kategorii. Najpierw dodaj cenę do cennika.';
     END IF;
     
-    if (nowa_cena is null or nowa_kara is null) THEN
+    if (nowa_cena is null or nowa_naliczona_kara is null) THEN
     	return 'Cena i kara nie moga przyjmowac wartosci NULL!';
     end if;
     
     update cennik set cena = nowa_cena
     where id_lokacji = moje_id_lokacji AND id_kategorii = moje_id_kategorii;
     
-    update cennik set kara = nowa_kara
+    update cennik set naliczona_kara = nowa_naliczona_kara
     where id_lokacji = moje_id_lokacji AND id_kategorii = moje_id_kategorii;
     
-    return 'Cena zmieniona poprawnie!';
+    return 'Cennik zmieniony poprawnie!';
     
  end;
  $$ LANGUAGE 'plpgsql';
 
+
+
+
+/* Funkcja zmieniająca cenę o podany procent w cenniku dla podanej lokacji i kategorii */
+create or replace function zmien_cennik_o_procent (procent_ceny DECIMAL(7, 3), procent_kary DECIMAL(7,3), 
+                                                   moje_id_lokacji INTEGER, moje_id_kategorii INTEGER)
+RETURNS TEXT AS $$
+DECLARE
+	czy_istnieje_cena boolean;
+    	czy_istnieje_lokacja boolean;
+    	czy_istnieje_kategoria boolean;
+BEGIN
+
+	select count(1) > 0 into czy_istnieje_lokacja from lokacje where id_lokacji = moje_id_lokacji;
+    	select count(1) > 0 into czy_istnieje_kategoria from kategorie where id_kategorii = moje_id_kategorii;
+	SELECT count(1) > 0 INTO czy_istnieje_cena FROM cennik WHERE id_kategorii = moje_id_kategorii 
+    								and id_lokacji = moje_id_lokacji;
+                                    
+    if procent_ceny < -1 or procent_kary < -1 then
+    	RETURN 'Nie można obniżyć ceny o więcej niż 100 procent!' ;
+    end if;
+                                                            
+    if not czy_istnieje_lokacja THEN
+    	RETURN 'Nie istnieje lokacja o podanym ID :(';
+    END IF;
+    
+    if not czy_istnieje_kategoria THEN
+    	RETURN 'Nie istnieje kategoria o podanym ID :(';
+    END IF;
+    
+    if not czy_istnieje_cena THEN
+    	RETURN 'W cenniku nie ma podanej ceny dla wybranej lokacji i kategorii.
+        Najpierw dodaj cenę do cennika.';
+    END IF;
+    
+    
+    update cennik set cena = (1 + procent_ceny)*cena
+    where id_lokacji = moje_id_lokacji AND id_kategorii = moje_id_kategorii;
+    
+    update cennik set naliczona_kara = (1 + procent_kary)*naliczona_kara
+    where id_lokacji = moje_id_lokacji AND id_kategorii = moje_id_kategorii;
+    
+    return 'Cennik zmieniony poprawnie!';
+    
+ end;
+ $$ LANGUAGE 'plpgsql';
 
 
 
@@ -516,52 +563,6 @@ BEGIN
  end;
  $$ LANGUAGE 'plpgsql';
 
-
-
-
-/* Funkcja zmieniająca cenę o podany procent w cenniku dla podanej lokacji i kategorii */
-create or replace function zmien_cennik_o_procent (procent_ceny DECIMAL(7, 3), procent_kary DECIMAL(7,3), 
-                                                   moje_id_lokacji INTEGER, moje_id_kategorii INTEGER)
-RETURNS TEXT AS $$
-DECLARE
-	czy_istnieje_cena boolean;
-    czy_istnieje_lokacja boolean;
-    czy_istnieje_kategoria boolean;
-BEGIN
-
-	select count(1) > 0 into czy_istnieje_lokacja from lokacje where id_lokacji = moje_id_lokacji;
-    select count(1) > 0 into czy_istnieje_kategoria from kategorie where id_kategorii = moje_id_kategorii;
-	SELECT count(1) > 0 INTO czy_istnieje_cena FROM cennik WHERE id_kategorii = moje_id_kategorii 
-    								and id_lokacji = moje_id_lokacji;
-                                    
-    if procent_ceny < -1 or procent_kary < -1 then
-    	RETURN 'Nie można obniżyć ceny o więcej niż 100 procent!' ;
-    end if;
-                                                            
-    if not czy_istnieje_lokacja THEN
-    	RETURN 'Nie istnieje lokacja o podanym ID :(';
-    END IF;
-    
-    if not czy_istnieje_kategoria THEN
-    	RETURN 'Nie istnieje kategoria o podanym ID :(';
-    END IF;
-    
-    if not czy_istnieje_cena THEN
-    	RETURN 'W cenniku nie ma podanej ceny dla wybranej lokacji i kategorii.
-        Najpierw dodaj cenę do cennika.';
-    END IF;
-    
-    
-    update cennik set cena = (1 + procent_ceny)*cena
-    where id_lokacji = moje_id_lokacji AND id_kategorii = moje_id_kategorii;
-    
-    update cennik set kara = (1 + procent_kary)*kara
-    where id_lokacji = moje_id_lokacji AND id_kategorii = moje_id_kategorii;
-    
-    return 'Cennik zmieniony poprawnie!';
-    
- end;
- $$ LANGUAGE 'plpgsql';
 
 
 
