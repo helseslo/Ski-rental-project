@@ -94,6 +94,36 @@ $$ LANGUAGE 'plpgsql';
 
 
 
+create or replace function dodaj_sprzet(id_kategorii_arg INTEGER, rozmiar_arg INTEGER, firma_arg VARCHAR(50),
+                                       id_lokacji_arg INTEGER) 
+returns text as $$
+DECLARE
+	czy_istnieje_kategoria BOOLEAN;
+    	czy_istnieje_lokacja BOOLEAN;
+BEGIN
+
+	SELECT count(1) > 0 INTO czy_istnieje_kategoria FROM kategorie WHERE id_kategorii = id_kategorii_arg;
+    	SELECT count(1) > 0 INTO czy_istnieje_lokacja FROM lokacje WHERE id_lokacji = id_lokacji_arg;
+    
+    IF not czy_istnieje_kategoria THEN
+        RETURN 'Nie istnieje kategoria o podanym ID!';
+    END IF;
+
+    IF not czy_istnieje_lokacja THEN
+        RETURN 'Nie istnieje lokacja o podanym ID!';
+    END IF;
+    
+    if rozmiar_arg IS NULL THEN
+    	RETURN 'Rozmiar nie moze przyjmowac wartosci NULL!';
+    END IF;
+
+    INSERT INTO sprzet (id_kategorii, rozmiar, firma, id_lokacji) VALUES 
+    (id_kategorii_arg, rozmiar_arg, firma_arg, id_lokacji_arg);
+    RETURN 'Sprzet dodany poprawnie!';
+END;
+$$ LANGUAGE 'plpgsql'; 
+
+
 
 
 CREATE OR REPLACE FUNCTION dodaj_klienta(imie_arg VARCHAR(50), nazwisko_arg VARCHAR(50), 
