@@ -86,7 +86,7 @@ ui <- tagList(
                           tabPanel("Wszystkie lokacje", dataTableOutput('lokacje_lista', width="60%")),
                           
                           # funkcja do tworzenia lokacji
-                          tabPanel("Utwórz lokację",
+                          tabPanel("Dodaj lokację",
                                    textInput("lokacja_dodanie_nazwa","Podaj nazwę lokacji", value=""),
                                    textInput("lokacja_dodanie_miasto","Podaj miasto", value=""),
                                    textInput("lokacja_dodanie_ulica","Podaj ulicę", value=""),
@@ -145,6 +145,12 @@ ui <- tagList(
               theme = shinytheme("flatly"),
               tabsetPanel(
                 tabPanel("Cały sprzęt", dataTableOutput ('sprzet_lista', width="70%")),
+                tabPanel("Dodaj sprzęt",
+                         selectInput('sprzet_dodanie_id_kategorii', 'Wybierz id kategorii', choices =c(" ",dbGetQuery(con, "SELECT id_kategorii FROM kategorie order by 1"))),
+                         textInput("sprzet_dodanie_rozmiar","Podaj rozmiar", value=""),
+                         textInput("sprzet_dodanie_firma","Podaj firmę", value=""),
+                         selectInput('sprzet_dodanie_id_lokacji', 'Wybierz id lokacji', choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1"))),
+                         actionButton("dodaj_sprzet","Dodaj sprzęt")),
                 tabPanel("Top sprzęt", dataTableOutput('top_sprzet_lista', width="40%")),
                 
               )
@@ -257,6 +263,23 @@ server <- shinyServer(function(input, output, session){
     data <- dbFetch(res)
     updateTextInput(session,'kategoria_dodanie_nazwa', value="")
     output$kategorie_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM kategorie order by 1"))
+    shinyalert(print(data[1,1]), type = "info")
+  })
+  
+  # sprzet
+  # dodaj sprzet
+  observeEvent(input$dodaj_sprzet, {
+    
+    res <- dbSendStatement(con, paste0("select dodaj_sprzet(","'",input$sprzet_dodanie_id_kategorii,"'", ",", "'",
+                                       input$sprzet_dodanie_rozmiar,"'", ",", "'",
+                                       input$sprzet_dodanie_firma, "'", ",","'",
+                                       input$sprzet_dodanie_id_lokacji,"'", ")"))
+    data <- dbFetch(res)
+    updateSelectInput(session, 'sprzet_dodanie_id_kategorii', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_kategorii FROM kategorie order by 1")), selected = NULL)
+    updateTextInput(session,'sprzet_dodanie_rozmiar', value="")
+    updateTextInput(session,'sprzet_dodanie_firma', value="")
+    updateSelectInput(session, 'sprzet_dodanie_id_lokacji', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1")), selected = NULL)
+    output$sprzet_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM sprzet order by 1"))
     shinyalert(print(data[1,1]), type = "info")
   })
   
