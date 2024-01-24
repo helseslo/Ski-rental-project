@@ -109,10 +109,14 @@ ui <- dashboardPage(
               )
             )
     ),
-    tabItem(tabName="klienci",
-              fluidPage(
-                theme = shinytheme("flatly")
+    tabItem(tabName="klienci", h2("Klienci"),
+            fluidPage(
+              theme = shinytheme("flatly"),
+              tabsetPanel(
+                tabPanel("Wszyscy klienci", tableOutput ('klienci_lista')),
+                
               )
+            )
     ),
     tabItem(tabName="rejestr",
               fluidPage(
@@ -132,6 +136,7 @@ server <- shinyServer(function(input, output, session){
   output$kategorie_lista = renderTable(kategorie, align = "l", width = "100%")
   output$sprzet_lista = renderTable(sprzet, align = "l", width = "100%")
   output$cennik_lista = renderTable(cennik, align = "l", width = "100%")
+  output$klienci_lista = renderTable(klienci, align = "l", width = "100%")
 
 
   #guziki lokacje
