@@ -72,6 +72,30 @@ $$ LANGUAGE 'plpgsql';
 
 
 
+create or replace function dodaj_kategorie(nazwa_kategorii_arg VARCHAR(50)) 
+returns text as $$
+DECLARE
+	czy_istnieje_kategoria BOOLEAN;
+BEGIN
+
+	SELECT count(1) > 0 INTO czy_istnieje_kategoria FROM kategorie WHERE nazwa_kategorii = nazwa_kategorii_arg;
+    
+    IF czy_istnieje_kategoria THEN
+        RETURN 'Istnieje kategoria o podanej nazwie!';
+    END IF;
+
+
+    INSERT INTO kategorie (nazwa_kategorii) VALUES 
+    (nazwa_kategorii_arg);
+    RETURN 'Kategoria dodana poprawnie!';
+END;
+$$ LANGUAGE 'plpgsql'; 
+
+
+
+
+
+
 CREATE OR REPLACE FUNCTION dodaj_klienta(imie_arg VARCHAR(50), nazwisko_arg VARCHAR(50), 
                  nr_telefonu_arg VARCHAR(9),nr_dowodu_arg VARCHAR(8), pesel_arg VARCHAR(11))
 RETURNS TEXT AS $$
