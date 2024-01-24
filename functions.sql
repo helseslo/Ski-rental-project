@@ -37,7 +37,7 @@ BEGIN
 
 
 	IF czy_stanowisko_istnieje THEN
-        	RAISE EXCEPTION 'Istnieje juz stanowisko o podanej nazwie!';
+        	return 'Istnieje juz stanowisko o podanej nazwie!';
    	 END IF;
 
 
@@ -227,15 +227,15 @@ BEGIN
     SELECT id_lokacji INTO id_obecnej_lokacji_sprzetu FROM sprzet WHERE id_sprzetu = id_sprzetu_arg;
 
 	IF NOT czy_lokacja_istnieje THEN
-        RAISE EXCEPTION 'Nie istnieje lokacja o podanym ID!';
+        return 'Nie istnieje lokacja o podanym ID!';
     END IF;
 
     IF NOT czy_sprzet_istnieje THEN
-        RAISE EXCEPTION 'Nie istnieje sprzet o podanym ID!';
+        return 'Nie istnieje sprzet o podanym ID!';
     END IF;
 
     IF (id_obecnej_lokacji_sprzetu = id_nowej_lokacji_sprzetu) THEN
-        RAISE EXCEPTION 'Sprzet juz jest w danej lokacji!';
+        return 'Sprzet juz jest w danej lokacji!';
     END IF;
 
     UPDATE sprzet SET id_lokacji=id_nowej_lokacji_sprzetu WHERE id_sprzetu=id_sprzetu_arg;
@@ -269,11 +269,11 @@ BEGIN
         WHERE id_sprzetu = id_sprzetu_arg;
 
 	IF NOT czy_lokacja_istnieje THEN
-        RAISE EXCEPTION 'Nie istnieje lokacja o podanej nazwie!';
+        RETURN 'Nie istnieje lokacja o podanej nazwie!';
     END IF;
 
     IF NOT czy_sprzet_istnieje THEN
-        RAISE EXCEPTION 'Nie istnieje sprzet o podanym ID!';
+        RETURN 'Nie istnieje sprzet o podanym ID!';
     END IF;
 
     IF (nazwa_obecnej_lokacji_sprzetu = nazwa_nowej_lokacji_sprzetu) THEN
@@ -301,7 +301,7 @@ BEGIN
 
     /* Najpierw sprawdzamy, czy zostały wybrane prawidłowe daty*/
     IF (data_od > data_do) THEN
-            RAISE EXCEPTION 'Zakres dat jest nieprawidłowy!';
+            RETURN 'Zakres dat jest nieprawidłowy!';
     END IF;
 
     /* Procedura, jeśli nie został wybrany numer lokacji */
@@ -327,7 +327,7 @@ BEGIN
     SELECT count(1) > 0 INTO czy_lokacja_istnieje FROM lokacje WHERE id_lokacji = id_lokacji_arg;
 
     IF NOT czy_lokacja_istnieje THEN
-        RAISE EXCEPTION 'Nie istnieje lokacja o podanym ID!';
+        RETURN 'Nie istnieje lokacja o podanym ID!';
     END IF;
 
     /* Procedura, jeśli został wybrany numer lokacji */
@@ -370,7 +370,7 @@ BEGIN
 
     /* Najpierw sprawdzamy, czy zostały wybrane prawidłowe daty*/
     IF (data_od > data_do) THEN
-            RAISE EXCEPTION 'Zakres dat jest nieprawidłowy!';
+            RETURN 'Zakres dat jest nieprawidłowy!';
     END IF;
 
     /* Procedura, jeśli nie została wybrana nazwa lokacji */
@@ -396,7 +396,7 @@ BEGIN
     SELECT id_lokacji INTO id_lokacji_arg FROM lokacje WHERE nazwa_lokacji = nazwa_lokacji_arg;
 
     IF id_lokacji_arg IS NULL THEN
-        RAISE EXCEPTION 'Nie istnieje lokacja o podanej nazwie!';
+        RETURN 'Nie istnieje lokacja o podanej nazwie!';
     END IF;
 
 
@@ -501,11 +501,11 @@ BEGIN
     SELECT count(1) > 0 INTO czy_istnieje_pracownik FROM pracownicy WHERE id_pracownika = moje_id_pracownika;
     
     IF NOT czy_istnieje_stanowisko THEN
-        RAISE EXCEPTION 'Nie istnieje stanowisko o podanym ID :(';
+        RETURN 'Nie istnieje stanowisko o podanym ID :(';
     END IF;
 
     IF NOT czy_istnieje_pracownik THEN
-        RAISE EXCEPTION 'Nie istnieje pracownik o podanym ID :(';
+        RETURN 'Nie istnieje pracownik o podanym ID :(';
     END IF;
     
     update pracownicy set id_stanowiska = nowe_id_stanowiska 
@@ -535,19 +535,19 @@ BEGIN
     								and id_lokacji = moje_id_lokacji;
                                     
     if procent_ceny < -1 or procent_kary < -1 then
-    	raise exception 'Nie można obniżyć ceny o więcej niż 100 procent!' ;
+    	RETURN 'Nie można obniżyć ceny o więcej niż 100 procent!' ;
     end if;
                                                             
     if not czy_istnieje_lokacja THEN
-    	RAISE EXCEPTION 'Nie istnieje lokacja o podanym ID :(';
+    	RETURN 'Nie istnieje lokacja o podanym ID :(';
     END IF;
     
     if not czy_istnieje_kategoria THEN
-    	RAISE EXCEPTION 'Nie istnieje kategoria o podanym ID :(';
+    	RETURN 'Nie istnieje kategoria o podanym ID :(';
     END IF;
     
     if not czy_istnieje_cena THEN
-    	RAISE EXCEPTION 'W cenniku nie ma podanej ceny dla wybranej lokacji i kategorii.
+    	RETURN 'W cenniku nie ma podanej ceny dla wybranej lokacji i kategorii.
         Najpierw dodaj cenę do cennika.';
     END IF;
     
@@ -597,10 +597,10 @@ $func$;*/
 /* Funkcja zmieniająca dane klienta */
  create or replace function zmien_dane_klienta(moje_id_klienta INTEGER, nowe_imie VARCHAR(50),
                                                 nowe_nazwisko VARCHAR(50), nowy_nr_telefonu VARCHAR(9),
-                           					 	nowy_nr_dowodu VARCHAR(8), nowy_pesel VARCHAR(11),
-                            					nowa_czarna_lista BOOLEAN)
+                           			nowy_nr_dowodu VARCHAR(8), nowy_pesel VARCHAR(11),
+                            			nowa_czarna_lista BOOLEAN)
  returns TEXT AS $$
- DEclare
+ Declare
  	czy_istnieje_klient boolean;
     
  BEGIN
@@ -608,7 +608,7 @@ $func$;*/
  	SELECT count(1) > 0 INTO czy_istnieje_klient FROM klienci WHERE id_klienta = moje_id_klienta;
     
     IF NOT czy_istnieje_klient THEN
-        RAISE EXCEPTION 'W bazie nie istnieje klient o podanym ID.';
+        RETURN 'W bazie nie istnieje klient o podanym ID.';
     END IF;
     
    update klienci
@@ -645,7 +645,7 @@ $func$;*/
 /* Funkcja zmieniająca dane pracownika; analogiczna do tej dla klienta */
 create or replace function zmien_dane_pracownika(moje_id_pracownika INTEGER, nowe_imie VARCHAR(50),
                                                 nowe_nazwisko VARCHAR(50), nowe_id_lokacji INTEGER,
-                           					 	nowe_id_stanowiska INTEGER)
+                           			nowe_id_stanowiska INTEGER)
  returns TEXT AS $$
  DEclare
  	czy_istnieje_pracownik boolean;
@@ -655,7 +655,7 @@ create or replace function zmien_dane_pracownika(moje_id_pracownika INTEGER, now
  	SELECT count(1) > 0 INTO czy_istnieje_pracownik FROM pracownicy WHERE id_pracownika = moje_id_pracownika;
     
     IF NOT czy_istnieje_pracownik THEN
-        RAISE EXCEPTION 'W bazie nie istnieje pracownik o podanym ID.';
+        RETURN 'W bazie nie istnieje pracownik o podanym ID.';
     END IF;
     
    update pracownicy
@@ -698,11 +698,11 @@ BEGIN
     select id_sprzetu into nr_sprzetu from rejestr where id_wypozyczenia = moje_id_wypozyczenia;
     
      if not czy_istnieje_wypozyczenie THEN
-    	RAISE EXCEPTION 'W bazie nie istnieje wypozyczenie o podanym ID !';
+    	RETURN 'W bazie nie istnieje wypozyczenie o podanym ID !';
     END IF;
     
     if not czy_jeszcze_nieoddane THEN
-    	RAISE EXCEPTION 'Dla wypozyczenia o podanym ID zwrot juz zostal dokonany.';
+    	RETURN 'Dla wypozyczenia o podanym ID zwrot juz zostal dokonany.';
     END IF; 
     
     update rejestr set data_zwrotu = (SELECT CURRENT_TIMESTAMP) 
