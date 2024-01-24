@@ -690,13 +690,22 @@ DECLARE
 	czy_istnieje_wypozyczenie BOOLEAN;
     	czy_jeszcze_nieoddane BOOLEAN;
     	nr_sprzetu INTEGER;
+        wielkosc_kary_za_dzien INTEGER;
+        obecna_data DATE;
+        czy_przekroczono_max_przedl BOOLEAN;
+        ile_po_terminie integer;
 
 BEGIN
 	
     /* czy_jeszcze_nieoddane zapobiega zaktualizowaniu daty oddania w przypadku wypożyczenia, które jest już nieaktualne */
 	SELECT count(1) > 0 INTO czy_istnieje_wypozyczenie FROM rejestr WHERE id_wypozyczenia = moje_id_wypozyczenia;
-    select count(1) > 0 into czy_jeszcze_nieoddane from rejestr where id_wypozyczenia = moje_id_wypozyczenia and czy_aktualne = 't';
+    select count(1) > 0 into czy_jeszcze_nieoddane from rejestr 
+	    where id_wypozyczenia = moje_id_wypozyczenia and czy_aktualne = 't';
     select id_sprzetu into nr_sprzetu from rejestr where id_wypozyczenia = moje_id_wypozyczenia;
+    select cennik.kara into wielkosc_kary_za_dzien from cennik join sprzet using(id_kategorii, id_lokacji)
+    	where sprzet.id_sprzetu = nr_sprzetu;
+    select CURRENT_date into obecna_data;
+    select current_date - data_zwrotu::DATE into ile_po_terminie from rejestr where id_wypozyczenia = moje_id_wypozyczenia;
     
      if not czy_istnieje_wypozyczenie THEN
     	RETURN 'W bazie nie istnieje wypozyczenie o podanym ID !';
@@ -705,13 +714,24 @@ BEGIN
     if not czy_jeszcze_nieoddane THEN
     	RETURN 'Dla wypozyczenia o podanym ID zwrot juz zostal dokonany.';
     END IF; 
+
+    if ile_po_terminie > 7 THEN
+    	update klienci set czarna_lista = 't' 
+        where id_klienta = (select id_klienta from rejestr where id_wypozyczenia = moje_id_wypozyczenia);
+     end if;
     
-    update rejestr set data_zwrotu = (SELECT CURRENT_TIMESTAMP) 
+    /* jeżeli oddano po terminie, naliczamy karę */
+    update rejestr set naliczona_kara = wielkosc_kary_za_dzien * ile_po_terminie
+    where id_wypozyczenia = moje_id_wypozyczenia and data_zwrotu < obecna_data;
+    
+    /* zmieniamy date zwrotu na date obecną */
+    update rejestr set data_zwrotu = obecna_data
     WHERE id_wypozyczenia = moje_id_wypozyczenia;
     
     /* musimy zmienic atrybut czy_aktualne */
     update rejestr set czy_aktualne = 'f'
     where id_wypozyczenia = moje_id_wypozyczenia;
+   
     
     /* w tabeli sprzęt musimy zmienić atrybut 'stan_wypozyczenia' dla sprzętu, który został oddany */
     update sprzet set stan_wypozyczenia = 'f'
