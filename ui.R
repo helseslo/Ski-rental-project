@@ -9,7 +9,7 @@ library(DBI)
 library(RPostgreSQL)
 setwd("/Users/hss/Documents/bazunie/Ski-rental-project")
 #source(file='functions.R')
-
+/* :) */
 
 con <- dbConnect(RPostgres::Postgres(),
                  dbname = 'projekt', # nazwa naszej projektowej bazy
