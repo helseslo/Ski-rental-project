@@ -7,6 +7,8 @@ library(sodium)
 library(shinyalert)
 library(DBI)
 library(RPostgreSQL)
+library(shinyBS)
+library(DT)
 setwd("/Users/hss/Documents/bazunie/Ski-rental-project")
 #source(file='functions.R')
 
@@ -31,11 +33,28 @@ rejestr <- dbGetQuery(con, "SELECT * FROM rejestr")
 
 
 
-
-ui <- dashboardPage(
+ui <- tagList(
+  tags$style("html,body{background-color: white;}
+                .container{
+                    width: 100%;
+                    margin: 0 auto;
+                    padding: 0;
+                    font-size: 13px;
+                }
+                #myimg{
+                    width:100%;
+                }
+               @media screen and (min-width: 800px){
+                .container{
+                    width: 1920px;
+                    height: 1080px;
+                }
+               }"),
+  tags$div(class="container", dashboardPage(
   skin = 'black',
   dashboardHeader(title = "Wypożyczalnia sprzętu narciarskiego \"PANDA 3\"",titleWidth = 450),
   dashboardSidebar(
+    width = 120,
     sidebarMenu(
       menuItem('Lokacje', tabName="lokacje", icon=icon("house")),
       menuItem('Pracownicy', tabName="pracownicy", icon=icon("user")),
@@ -51,8 +70,9 @@ ui <- dashboardPage(
     tabItems(
       tabItem(tabName="lokacje", h2("Lokacje"),
               fluidPage(theme = shinytheme("flatly"),
+                        height = '100%',
                         tabsetPanel(
-                          tabPanel("Wszystkie lokacje", tableOutput('lokacje_lista')),
+                          tabPanel("Wszystkie lokacje", dataTableOutput('lokacje_lista', width="70%")),
                           tabPanel("Utwórz lokację",textInput("lokacja_dodanie_nazwa","Podaj nazwę lokacji", value=""),
                                    textInput("lokacja_dodanie_miasto","Podaj miasto", value=""),
                                    textInput("lokacja_dodanie_ulica","Podaj ulicę", value=""),
@@ -68,7 +88,7 @@ ui <- dashboardPage(
     tabItem(tabName="pracownicy", h2("Pracownicy"),
               fluidPage(theme = shinytheme("flatly"),
                          tabsetPanel(
-                           tabPanel("Wszyscy pracownicy", tableOutput ('pracownicy_lista')),
+                           tabPanel("Wszyscy pracownicy", dataTableOutput ('pracownicy_lista', width="70%")),
                            
                          )
               )
@@ -77,7 +97,7 @@ ui <- dashboardPage(
               fluidPage(
                 theme = shinytheme("flatly"),
                 tabsetPanel(
-                  tabPanel("Wszystkie stanowiska", tableOutput ('stanowiska_lista')),
+                  tabPanel("Wszystkie stanowiska", dataTableOutput ('stanowiska_lista', width="70%")),
                   
                 )
               )
@@ -86,7 +106,7 @@ ui <- dashboardPage(
             fluidPage(
               theme = shinytheme("flatly"),
               tabsetPanel(
-                tabPanel("Wszystkie kategorie", tableOutput ('kategorie_lista')),
+                tabPanel("Wszystkie kategorie", dataTableOutput ('kategorie_lista', width="70%")),
                 
               )
             )
@@ -95,7 +115,7 @@ ui <- dashboardPage(
             fluidPage(
               theme = shinytheme("flatly"),
               tabsetPanel(
-                tabPanel("Cały sprzęt", tableOutput ('sprzet_lista')),
+                tabPanel("Cały sprzęt", dataTableOutput ('sprzet_lista', width="70%")),
                 
               )
             )
@@ -104,7 +124,7 @@ ui <- dashboardPage(
             fluidPage(
               theme = shinytheme("flatly"),
               tabsetPanel(
-                tabPanel("Wszystkie ceny i kary", tableOutput ('cennik_lista')),
+                tabPanel("Wszystkie ceny i kary", dataTableOutput ('cennik_lista', width="70%")),
                 
               )
             )
@@ -113,30 +133,37 @@ ui <- dashboardPage(
             fluidPage(
               theme = shinytheme("flatly"),
               tabsetPanel(
-                tabPanel("Wszyscy klienci", tableOutput ('klienci_lista')),
+                tabPanel("Wszyscy klienci", dataTableOutput ('klienci_lista', width="70%")),
                 
               )
             )
-    ),
-    tabItem(tabName="rejestr",
-              fluidPage(
-                theme = shinytheme("flatly")
+      ),
+    tabItem(tabName="rejestr", h2("Rejestr"),
+            fluidPage(
+              theme = shinytheme("flatly"),
+              tabsetPanel(
+                tabPanel("Pełny rejestr", dataTableOutput ('rejestr_lista', width = "70%")),
+                
               )
+            )
+      )
+      )
     )
-    )
+  )
   )
 )
 
 server <- shinyServer(function(input, output, session){
   # tabele do wyświetlenia
-  output$lokacje_lista <- renderTable( dbGetQuery(con, "SELECT id_lokacji, nazwa_lokacji,
-                                                  miasto, ulica, nr_posesji FROM lokacje order by 1"), align = "l", width = "100%")
-  output$pracownicy_lista = renderTable( pracownicy, align = "l", width = "100%")
-  output$stanowiska_lista = renderTable(stanowiska, align = "l", width = "100%")
-  output$kategorie_lista = renderTable(kategorie, align = "l", width = "100%")
-  output$sprzet_lista = renderTable(sprzet, align = "l", width = "100%")
-  output$cennik_lista = renderTable(cennik, align = "l", width = "100%")
-  output$klienci_lista = renderTable(klienci, align = "l", width = "100%")
+  output$lokacje_lista <- renderDataTable( dbGetQuery(con, "SELECT id_lokacji, nazwa_lokacji,
+                                                  miasto, ulica, nr_posesji FROM lokacje order by 1"))
+  output$pracownicy_lista = renderDataTable(pracownicy)
+  output$stanowiska_lista = renderDataTable(stanowiska)
+  output$kategorie_lista = renderDataTable(kategorie)
+  output$sprzet_lista = renderDataTable(sprzet)
+  output$cennik_lista = renderDataTable(cennik)
+  output$klienci_lista = renderDataTable(klienci)
+  output$rejestr_lista = DT::renderDataTable({datatable(rejestr) %>% formatDate(4:6, "toLocaleString")})
 
 
   #guziki lokacje
@@ -160,4 +187,4 @@ server <- shinyServer(function(input, output, session){
 
 })
 
-shinyApp(ui, server)
+shinyApp(ui, server, options = list(height = 1080))
