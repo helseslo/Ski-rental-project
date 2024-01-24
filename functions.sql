@@ -131,7 +131,7 @@ $$ LANGUAGE 'plpgsql';
 
 
 /* cennik */
-CREATE OR REPLACE FUNCTION dodaj_cene(cena_arg DECIMAL(7,2), naliczona_kara_arg DECIMAL(7,2), 
+CREATE OR REPLACE FUNCTION dodaj_cene(cena_arg DECIMAL(7,2), kara_arg DECIMAL(7,2), 
 					id_lokacji_arg INTEGER, id_kategorii_arg INTEGER)
 RETURNS TEXT AS $$
 DECLARE
@@ -159,13 +159,13 @@ BEGIN
     end if;
     
     /* sprawdzmy, czy uzytkownik wpisał null */
-    if (cena_arg IS NULL or naliczona_kara_arg IS NULL) THEN
+    if (cena_arg IS NULL or kara_arg IS NULL) THEN
     	return 'Cena i kara musza przyjmowac wartosci inne niz null!';
     end if;
 
 
-    INSERT INTO cennik (cena, naliczona_kara, id_lokacji, id_kategorii) VALUES 
-    (cena_arg, naliczona_kara_arg, id_lokacji_arg, id_kategorii_arg);
+    INSERT INTO cennik (cena, kara, id_lokacji, id_kategorii) VALUES 
+    (cena_arg, kara_arg, id_lokacji_arg, id_kategorii_arg);
     RETURN 'Cena dodana poprawnie!';
 END;
 $$ LANGUAGE 'plpgsql'; 
