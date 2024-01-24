@@ -443,8 +443,9 @@ order by ilosc_wypozyczen DESC, sprzet.id_sprzetu;
 
 
 
-/* Funkcja zmieniająca cenę w cenniku dla podanej lokacji i kategorii */
-create or replace function zmien_cene (nowa_cena NUMERIC(7,2), moje_id_lokacji INTEGER, moje_id_kategorii INTEGER)
+/* Funkcja zmieniająca cenę i karę w cenniku dla podanej lokacji i kategorii */
+create or replace function zmien_cennik (nowa_cena DECIMAL(7,2), nowa_kara DECIMAL(7,2),
+                                         moje_id_lokacji INTEGER, moje_id_kategorii INTEGER)
 returns TEXT as $$
 DECLARE
     czy_istnieje_cena boolean;
@@ -458,21 +459,26 @@ BEGIN
     								and id_lokacji = moje_id_lokacji;
                                                             
     if not czy_istnieje_lokacja THEN
-    	RAISE EXCEPTION 'Nie istnieje lokacja o podanym ID :(';
+    	return 'Nie istnieje lokacja o podanym ID :(';
     END IF;
     
     if not czy_istnieje_kategoria THEN
-    	RAISE EXCEPTION 'Nie istnieje kategoria o podanym ID :(';
+    	return 'Nie istnieje kategoria o podanym ID :(';
     END IF;
     
     /* Istnieje taka lokacja i kategoria, ale nie ma przypisanej ceny w cenniku dla tej lokacji i kategorii */
-    /* Wtedy dodajemy cenę do cennika */
     IF NOT czy_istnieje_cena THEN
-    	insert into cennik (cena, id_lokacji, id_kategorii) values (nowa_cena, moje_id_lokacji, moje_id_kategorii);
-        return 'Dodano cenę do cennika';
+        return 'W cenniku nie ma ceny dla podanej lokacji i kategorii. Najpierw dodaj cenę do cennika.';
     END IF;
     
+    if (nowa_cena is null or nowa_kara is null) THEN
+    	return 'Cena i kara nie moga przyjmowac wartosci NULL!';
+    end if;
+    
     update cennik set cena = nowa_cena
+    where id_lokacji = moje_id_lokacji AND id_kategorii = moje_id_kategorii;
+    
+    update cennik set kara = nowa_kara
     where id_lokacji = moje_id_lokacji AND id_kategorii = moje_id_kategorii;
     
     return 'Cena zmieniona poprawnie!';
@@ -514,7 +520,8 @@ BEGIN
 
 
 /* Funkcja zmieniająca cenę o podany procent w cenniku dla podanej lokacji i kategorii */
-create or replace function zmien_cene_o_procent (procent DECIMAL(7, 2), moje_id_lokacji INTEGER, moje_id_kategorii INTEGER)
+create or replace function zmien_cennik_o_procent (procent_ceny DECIMAL(7, 3), procent_kary DECIMAL(7,3), 
+                                                   moje_id_lokacji INTEGER, moje_id_kategorii INTEGER)
 RETURNS TEXT AS $$
 DECLARE
 	czy_istnieje_cena boolean;
@@ -527,7 +534,7 @@ BEGIN
 	SELECT count(1) > 0 INTO czy_istnieje_cena FROM cennik WHERE id_kategorii = moje_id_kategorii 
     								and id_lokacji = moje_id_lokacji;
                                     
-    if procent < -1 then
+    if procent_ceny < -1 or procent_kary < -1 then
     	raise exception 'Nie można obniżyć ceny o więcej niż 100 procent!' ;
     end if;
                                                             
@@ -545,10 +552,13 @@ BEGIN
     END IF;
     
     
-    update cennik set cena = (1 + procent)*cena
+    update cennik set cena = (1 + procent_ceny)*cena
     where id_lokacji = moje_id_lokacji AND id_kategorii = moje_id_kategorii;
     
-    return 'Cena zmieniona poprawnie!';
+    update cennik set kara = (1 + procent_kary)*kara
+    where id_lokacji = moje_id_lokacji AND id_kategorii = moje_id_kategorii;
+    
+    return 'Cennik zmieniony poprawnie!';
     
  end;
  $$ LANGUAGE 'plpgsql';
@@ -677,8 +687,8 @@ create or replace function zwrot (moje_id_wypozyczenia INTEGER)
 returns text AS $$
 DECLARE
 	czy_istnieje_wypozyczenie BOOLEAN;
-    czy_jeszcze_nieoddane BOOLEAN;
-    nr_sprzetu INTEGER;
+    	czy_jeszcze_nieoddane BOOLEAN;
+    	nr_sprzetu INTEGER;
 
 BEGIN
 	
