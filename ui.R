@@ -57,6 +57,7 @@ ui <- dashboardPage(
                                    textInput("lokacja_dodanie_ulica","Podaj ulicę", value=""),
                                    textInput("lokacja_dodanie_nr","Podaj numer posesji", value=""),
                                    actionButton("dodaj_lokacje","Dodaj lokację")),
+                          
                         )
                     )
               ),

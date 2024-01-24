@@ -107,7 +107,7 @@ BEGIN
         IF (sumaryczny_przychod_podstawowy IS NULL) THEN
             sumaryczny_przychod_podstawowy := 0;
         END IF;
-        SELECT sum(kara)
+        SELECT sum(naliczona_kara)
             INTO sumaryczny_przychod_kary
             FROM rejestr
             WHERE (data_zwrotu >= data_od AND data_zwrotu <= (data_do+1)); 
@@ -132,7 +132,7 @@ BEGIN
     IF (sumaryczny_przychod_podstawowy IS NULL) THEN
         sumaryczny_przychod_podstawowy := 0;
     END IF;
-    SELECT sum(rejestr.kara)
+    SELECT sum(rejestr.naliczona_kara)
         INTO sumaryczny_przychod_kary
         FROM (rejestr JOIN sprzet USING(id_sprzetu))
         WHERE (rejestr.data_zwrotu >= data_od AND rejestr.data_zwrotu <= (data_do+1) AND sprzet.id_lokacji=id_lokacji_arg);
@@ -176,7 +176,7 @@ BEGIN
         IF (sumaryczny_przychod_podstawowy IS NULL) THEN
             sumaryczny_przychod_podstawowy := 0;
         END IF;
-        SELECT sum(kara)
+        SELECT sum(naliczona_kara)
             INTO sumaryczny_przychod_kary
             FROM rejestr
             WHERE (data_zwrotu >= data_od AND data_zwrotu <= (data_do+1)); 
@@ -202,7 +202,7 @@ BEGIN
     IF (sumaryczny_przychod_podstawowy IS NULL) THEN
         sumaryczny_przychod_podstawowy := 0;
     END IF;
-    SELECT sum(rejestr.kara)
+    SELECT sum(rejestr.naliczona_kara)
         INTO sumaryczny_przychod_kary
         FROM (rejestr JOIN sprzet USING(id_sprzetu))
         WHERE (rejestr.data_zwrotu >= data_od AND rejestr.data_zwrotu <= (data_do+1) AND sprzet.id_lokacji=id_lokacji_arg);

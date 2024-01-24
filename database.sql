@@ -56,6 +56,7 @@ CREATE TABLE sprzet (
 
 CREATE TABLE cennik (
     cena DECIMAL(7,2) NOT NULL CHECK (cena > 0),
+    kara DECIMAL(7,2) NOT NULL CHECK (kara > 0),
     id_lokacji INTEGER REFERENCES lokacje(id_lokacji) ON DELETE CASCADE ON UPDATE CASCADE,
     id_kategorii INTEGER REFERENCES kategorie(id_kategorii) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -80,7 +81,7 @@ CREATE TABLE rejestr(
     data_zwrotu TIMESTAMP CHECK (data_zwrotu > data_wypozyczenia) NOT NULL,
     maksymalne_przedluzenie TIMESTAMP DEFAULT('3000-01-01') NOT NULL,
     podstawowy_koszt DECIMAL(7, 2) DEFAULT(0) CHECK (podstawowy_koszt >= 0) NOT NULL,
-    kara DECIMAL (7, 2) DEFAULT(0) CHECK (kara >= 0) NOT NULL,
+    naliczona_kara DECIMAL (7, 2) DEFAULT(0) CHECK (naliczona_kara >= 0) NOT NULL,
     czy_aktualne BOOLEAN DEFAULT (FALSE) NOT NULL
 );
 
@@ -167,5 +168,5 @@ INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, pod
 INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, podstawowy_koszt) VALUES (1, 9, '2024-01-01 12:00:00', '2024-01-02 11:00:00', 1);
 INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, podstawowy_koszt) VALUES (2, 1, '2024-01-03 14:00:00', '2024-01-04 12:00:00', 1);
 INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, podstawowy_koszt) VALUES (2, 9, '2024-01-03 10:00:00', '2024-01-04 9:00:00', 1);
-INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, podstawowy_koszt, kara) VALUES (3, 6, '2024-01-01 10:00:00', '2024-01-03 10:00:00', 50, 50);
+INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, podstawowy_koszt, naliczona_kara) VALUES (3, 6, '2024-01-01 10:00:00', '2024-01-03 10:00:00', 50, 50);
 
