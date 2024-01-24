@@ -9,7 +9,7 @@ library(DBI)
 library(RPostgreSQL)
 setwd("/Users/hss/Documents/bazunie/Ski-rental-project")
 #source(file='functions.R')
-/* :) */
+
 
 con <- dbConnect(RPostgres::Postgres(),
                  dbname = 'projekt', # nazwa naszej projektowej bazy
@@ -65,7 +65,10 @@ ui <- dashboardPage(
       
       
     tabItem(tabName="pracownicy", h2("Pracownicy"),
-              fluidPage(
+              fluidPage(theme = shinytheme("flatly"),
+                         tabsetPanel(
+                           tabPanel("Wszyscy pracownicy", tableOutput ('pracownicy_lista'))
+                           
                 
               )
     ),
@@ -106,12 +109,13 @@ ui <- dashboardPage(
 server <- shinyServer(function(input, output, session){
   output$lokacje_lista <- renderTable( dbGetQuery(con, "SELECT id_lokacji, nazwa_lokacji,
                                                   miasto, ulica, nr_posesji FROM lokacje order by 1"), align = "l", width = "100%")
+  output$pracownicy_lista = renderTable( pracownicy, align = "l", width = "100%")
 
 
   #guziki lokacje
   #dodaj lokacje
   observeEvent(input$dodaj_lokacje, {
-    
+  
     res <- dbSendStatement(con, paste0("select dodaj_lokacje(","'",input$lokacja_dodanie_nazwa,"'", ",", "'",
                                        input$lokacja_dodanie_miasto,"'", ",", "'",
                                        input$lokacja_dodanie_ulica, "'", ",",
