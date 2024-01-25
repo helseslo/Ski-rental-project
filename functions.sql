@@ -807,26 +807,7 @@ BEGIN
 
 /*---------------------------------------------- WYZWALACZE------------------------------------- */
 
-create or replace function przenies_do_archiwum()
-returns trigger as $$
-BEGIN
-	insert into rejestr_archiwalny(id_wypozyczenia, id_klienta, id_sprzetu, data_wypozyczenia,
-                data_zwrotu, maksymalne_przedluzenie, podstawowy_koszt, naliczona_kara)
-                values (OLD.id_wypozyczenia, old.id_klienta, old.id_sprzetu, old.data_wypozyczenia,
-                old.data_zwrotu, old.maksymalne_przedluzenie, old.podstawowy_koszt, old.naliczona_kara);
-                return old;
-    END;
-$$ LANGUAGE 'plpgsql';
-
-create or replace trigger before_delete_rejestr
-before delete
-on rejestr
-for each row
-execute procedure przenies_do_archiwum();
-
-
-
-/*---------------------------------- FUNKCJE SUMARYCZNEGO PRZYCHODU-------------------------------*/
+/* FUNKCJE SUMARYCZNEGO PRZYCHODU*/
 /* Funkcja wyliczająca sumaryczny przychód; (w podanym zakresie dat, dla podanej lokacji - opcjonalnie)*/
 CREATE OR REPLACE FUNCTION sumaryczny_przychod_zakres_id(data_od DATE, data_do DATE, id_lokacji_arg INTEGER DEFAULT NULL)
 RETURNS TEXT AS $$
@@ -842,25 +823,6 @@ BEGIN
             RETURN 'Zakres dat jest nieprawidłowy!';
     END IF;
 
-    /* Procedura, jeśli nie został wybrany numer lokacji */
-    IF (id_lokacji_arg IS NULL) THEN
-        SELECT sum(podstawowy_koszt)
-            INTO sumaryczny_przychod_podstawowy
-            FROM rejestr
-            WHERE (data_wypozyczenia >= data_od AND data_wypozyczenia <= (data_do+1));
-        IF (sumaryczny_przychod_podstawowy IS NULL) THEN
-            sumaryczny_przychod_podstawowy := 0;
-        END IF;
-        SELECT sum(naliczona_kara)
-            INTO sumaryczny_przychod_kary
-            FROM rejestr
-            WHERE (data_zwrotu >= data_od AND data_zwrotu <= (data_do+1)); 
-        IF (sumaryczny_przychod_kary IS NULL) THEN
-            sumaryczny_przychod_kary := 0;
-        END IF;
-        sumaryczny_przychod := sumaryczny_przychod_podstawowy+sumaryczny_przychod_kary;
-        RETURN ('Sumaryczny przychód za ten okres to: ' || sumaryczny_przychod || ' zł.');
-    END IF;
 
     SELECT count(1) > 0 INTO czy_lokacja_istnieje FROM lokacje WHERE id_lokacji = id_lokacji_arg;
 
@@ -868,7 +830,7 @@ BEGIN
         RETURN 'Nie istnieje lokacja o podanym ID!';
     END IF;
 
-    /* Procedura, jeśli został wybrany numer lokacji */
+    /* Procedura*/
     SELECT sum(rejestr.podstawowy_koszt)
         INTO sumaryczny_przychod_podstawowy
         FROM (rejestr JOIN sprzet USING(id_sprzetu))
@@ -900,7 +862,9 @@ CREATE OR REPLACE FUNCTION sumaryczny_przychod_zakres(data_od DATE, data_do DATE
 RETURNS TEXT AS $$
 DECLARE
     sumaryczny_przychod_podstawowy DECIMAL(7, 2);
+    sumaryczny_przychod_podstawowy_archiwum DECIMAL(7, 2);
     sumaryczny_przychod_kary DECIMAL(7, 2);
+    sumaryczny_przychod_kary_archiwum DECIMAL(7, 2);
     sumaryczny_przychod DECIMAL(7, 2);
 BEGIN
 
@@ -909,13 +873,22 @@ BEGIN
             RETURN 'Zakres dat jest nieprawidłowy!';
     END IF;
 
-    /* Procedura, jeśli nie została wybrana nazwa lokacji */
+    /* Procedura*/
+        /* podstawowy koszt z rejestru*/
         SELECT sum(podstawowy_koszt)
             INTO sumaryczny_przychod_podstawowy
             FROM rejestr
             WHERE (data_wypozyczenia >= data_od AND data_wypozyczenia <= (data_do+1));
         IF (sumaryczny_przychod_podstawowy IS NULL) THEN
             sumaryczny_przychod_podstawowy := 0;
+        END IF;
+        /*podstawowy koszt z rejestru archiwalnego*/
+        SELECT sum(podstawowy_koszt)
+            INTO sumaryczny_przychod_podstawowy_archiwum
+            FROM rejestr_archiwalny
+            WHERE (data_wypozyczenia >= data_od AND data_wypozyczenia <= (data_do+1));
+        IF (sumaryczny_przychod_podstawowy_archiwum IS NULL) THEN
+            sumaryczny_przychod_podstawowy_archiwum := 0;
         END IF;
         SELECT sum(naliczona_kara)
             INTO sumaryczny_przychod_kary
@@ -924,7 +897,15 @@ BEGIN
         IF (sumaryczny_przychod_kary IS NULL) THEN
             sumaryczny_przychod_kary := 0;
         END IF;
-        sumaryczny_przychod := sumaryczny_przychod_podstawowy+sumaryczny_przychod_kary;
+        SELECT sum(naliczona_kara)
+            INTO sumaryczny_przychod_kary_archiwum
+            FROM rejestr
+            WHERE (data_zwrotu >= data_od AND data_zwrotu <= (data_do+1)); 
+        IF (sumaryczny_przychod_kary_archiwum IS NULL) THEN
+            sumaryczny_przychod_kary_archiwum := 0;
+        END IF;
+        sumaryczny_przychod := sumaryczny_przychod_podstawowy+sumaryczny_przychod_kary+
+        sumaryczny_przychod_podstawowy_archiwum+sumaryczny_przychod_kary_archiwum;
         RETURN ('Sumaryczny przychód za ten okres to: ' || sumaryczny_przychod || ' zł.');
 
 
