@@ -84,12 +84,18 @@ ui <- tagList(
               fluidPage(
                 theme = shinytheme("flatly"),
                 tabsetPanel(
-                  tabPanel("Przychód dla lokacji",
+                  tabPanel("Przychód w podanym zakresie dat",
                            h3("Sprawdź sumaryczny przychód w podanym zakresie"),
                            dateInput("przychod_data_od","Data początkowa:", "", format = 'yyyy-mm-dd'),
                            dateInput("przychod_data_do","Data końcowa:", "", format = 'yyyy-mm-dd', max=Sys.Date()),
-                           selectInput('sprawdz_przychod_id_lokacji', 'Wybierz id lokacji', choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1"))),
+            
                            actionButton("sprawdz_przychod","Sprawdź przychód")),
+                  tabPanel("Przychód dla lokacji w podanym zakresie dat",
+                           h3("Sprawdź sumaryczny przychód dla lokacji w podanym zakresie"),
+                           dateInput("przychod_lokacja_data_od","Data początkowa:", "", format = 'yyyy-mm-dd'),
+                           dateInput("przychod_lokacja_data_do","Data końcowa:", "", format = 'yyyy-mm-dd', max=Sys.Date()),
+                           selectInput('sprawdz_przychod_id_lokacji', 'Wybierz id lokacji', choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1"))),
+                           actionButton("sprawdz_przychod_lokacja","Sprawdź przychód")),
 
                   
                 )
@@ -262,11 +268,21 @@ server <- shinyServer(function(input, output, session){
   observeEvent(input$sprawdz_przychod, {
     
     res <- dbSendStatement(con, paste0("SELECT sumaryczny_przychod_zakres_id(","'",input$przychod_data_od,"'", ",", "'",
-                                       input$przychod_data_do,"'", ",", "'",
+                                       input$przychod_data_do,"'",")"))
+    data <- dbFetch(res)
+    updateDateInput(session, 'przychod_data_od', value=NA)
+    updateDateInput(session, 'przychod_data_do', value=NA, max=Sys.Date())
+    shinyalert(print(data[1,1]), type = "info")
+  })
+  # sprawdź przychód dla lokacji
+  observeEvent(input$sprawdz_przychod_lokacja, {
+    
+    res <- dbSendStatement(con, paste0("SELECT sumaryczny_przychod_zakres_id(","'",input$przychod_lokacja_data_od,"'", ",", "'",
+                                       input$przychod_lokacja_data_do,"'", ",", "'",
                                        input$sprawdz_przychod_id_lokacji, "'",")"))
     data <- dbFetch(res)
-    updateDateInput(session, 'przychod_data_od', min=Sys.Date())
-    updateDateInput(session, 'przychod_data_do', min=Sys.Date())
+    updateDateInput(session, 'przychod_lokacja_data_od', value=NA)
+    updateDateInput(session, 'przychod_lokacja_data_do',value=NA, max=Sys.Date())
     updateSelectInput(session, 'sprawdz_przychod_id_lokacji', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1")), selected = NULL)
     shinyalert(print(data[1,1]), type = "info")
   })
@@ -397,7 +413,7 @@ server <- shinyServer(function(input, output, session){
     data <- dbFetch(res)
     updateSelectInput(session, 'wypozycz_id_klienta', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_klienta FROM klienci order by id_klienta")), selected = NULL)
     updateSelectInput(session, 'wypozycz_id_sprzetu', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_sprzetu FROM sprzet WHERE stan_wypozyczenia=FALSE order by id_sprzetu")), selected = NULL)
-    updateDateInput(session, 'wypozycz_data_zwrotu', min=Sys.Date())
+    updateDateInput(session, 'wypozycz_data_zwrotu', value=NA, min=Sys.Date())
   
     output$rejestr_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM rejestr ORDER BY id_wypozyczenia"))
     shinyalert(print(data[1,1]), type = "info")
