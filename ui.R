@@ -331,7 +331,7 @@ server <- shinyServer(function(input, output, session){
   # sprawdź przychód
   observeEvent(input$sprawdz_przychod, {
     
-    res <- dbSendStatement(con, paste0("SELECT sumaryczny_przychod_zakres_id(","'",input$przychod_data_od,"'", ",", "'",
+    res <- dbSendStatement(con, paste0("SELECT sumaryczny_przychod_zakres(","'",input$przychod_data_od,"'", ",", "'",
                                        input$przychod_data_do,"'",")"))
     data <- dbFetch(res)
     updateDateInput(session, 'przychod_data_od', value=NA)
