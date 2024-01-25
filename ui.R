@@ -64,9 +64,10 @@ ui <- tagList(
   dashboardHeader(title = "Wypożyczalnia sprzętu narciarskiego \"PANDA 3\"",titleWidth = 450),
   # Pasek boczny - tytuły, ikonki i nazwy tabów, czyli podstron
   dashboardSidebar(
-    width = 120,
+    width = 140,
     sidebarMenu(
-      menuItem('Lokacje', tabName="lokacje", icon=icon("house")),
+      menuItem('Strona główna', tabName="glowna", icon=icon("house")),
+      menuItem('Lokacje', tabName="lokacje", icon=icon("location-dot")),
       menuItem('Pracownicy', tabName="pracownicy", icon=icon("user")),
       menuItem('Stanowiska', tabName="stanowiska", icon=icon("briefcase")),
       menuItem('Kategorie', tabName="kategorie", icon=icon("list")),
@@ -79,6 +80,21 @@ ui <- tagList(
   dashboardBody(
     # tabItem to jedna podstrona w pasku bocznym; nazwa tabName musi się zgadzać z nazwami piętro wyżej! h2 to tytuł
     tabItems(
+      tabItem(tabName="glowna", h2("Strona główna"),
+              fluidPage(
+                theme = shinytheme("flatly"),
+                tabsetPanel(
+                  tabPanel("Przychód dla lokacji",
+                           h3("Sprawdź sumaryczny przychód w podanym zakresie"),
+                           dateInput("przychod_data_od","Data początkowa:", "", format = 'yyyy-mm-dd'),
+                           dateInput("przychod_data_do","Data końcowa:", "", format = 'yyyy-mm-dd', max=Sys.Date()),
+                           selectInput('sprawdz_przychod_id_lokacji', 'Wybierz id lokacji', choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1"))),
+                           actionButton("sprawdz_przychod","Sprawdź przychód")),
+
+                  
+                )
+              )
+      ),
       tabItem(tabName="lokacje", h2("Lokacje"),
               fluidPage(theme = shinytheme("flatly"),
                         height = '100%',
@@ -241,6 +257,23 @@ server <- shinyServer(function(input, output, session){
   output$czarna_lista_lista = renderDataTable(top_sprzet)
   
   # GUZIKI
+  # główna
+  # sprawdź przychód
+  observeEvent(input$sprawdz_przychod, {
+    
+    res <- dbSendStatement(con, paste0("SELECT sumaryczny_przychod_zakres_id(","'",input$przychod_data_od,"'", ",", "'",
+                                       input$przychod_data_do,"'", ",", "'",
+                                       input$sprawdz_przychod_id_lokacji, "'",")"))
+    data <- dbFetch(res)
+    updateDateInput(session, 'przychod_data_od', min=Sys.Date())
+    updateDateInput(session, 'przychod_data_do', min=Sys.Date())
+    updateSelectInput(session, 'sprawdz_przychod_id_lokacji', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1")), selected = NULL)
+    shinyalert(print(data[1,1]), type = "info")
+  })
+
+  
+  
+  
   # lokacje
   # dodaj lokacje
   observeEvent(input$dodaj_lokacje, {
