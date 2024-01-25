@@ -797,7 +797,7 @@ BEGIN
 	return 'Usunieto lokacje.';
     
     end;
-$$ language 'plpgsql'
+$$ language 'plpgsql';
 
 
 /*----------------------- ZWROT----------------------*/
