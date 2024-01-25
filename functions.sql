@@ -241,19 +241,19 @@ BEGIN
     END IF;
     
     if not czy_istnieje_sprzet THEN
-    	RETURN 'W bazie nie istnieje sprzet o podanym ID !';
+    	RETURN 'W bazie nie istnieje sprzęt o podanym ID !';
     END IF;
     
     if not czy_sprzet_jest_dostepny THEN
-    	return 'Sprzet o podanym ID jest juz wypozyczony!';
+    	return 'Sprzęt o podanym ID jest już wypożyczony!';
     end if;
     
     if czy_klient_na_czarnej_liscie THEN
-    	return 'Klient jest na czarnej liscie - nie moze wypozyczyc sprzetu.';
+    	return 'Klient jest na czarnej liście - nie moze wypożyczyć sprzętu.';
     end if;
     
     if (data_zwrotu_arg < (SELECT CURRENT_DATE)) THEN
-    	return 'Data zwrotu nie moze byc wczesniejsza niz obecna data!';
+    	return 'Data zwrotu nie może byc wcześniejsza niż obecna data!';
     end if;
 
     
@@ -266,7 +266,7 @@ BEGIN
     update sprzet set stan_wypozyczenia = 't'
     where id_sprzetu = id_sprzetu_arg;
 
-    return 'Wypozyczenie dodane poprawnie!';
+    return 'Wypożyczenie dodane poprawnie!';
     
  end;
  $$ LANGUAGE 'plpgsql';
