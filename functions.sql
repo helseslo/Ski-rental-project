@@ -207,7 +207,7 @@ END;
 $$ LANGUAGE 'plpgsql'; 
 
 
-
+/* WYPOŻYCZ */
 
 /* dodaj rejestr */
 create or replace function wypozycz (id_klienta_arg INTEGER, id_sprzetu_arg INTEGER,
@@ -277,7 +277,7 @@ BEGIN
 /* Funkcja sluzaca do zmiany lokacji sprzetu; uzywana w przypadku, gdy chcemy przeniesc konkrenty sprzet do innej lokalizacji.
 W tej wersji jako argument podajemy id sprzetu, ktorego lokacje chcemy zmienic oraz id tej lokacji.*/
 
-CREATE OR REPLACE FUNCTION zmien_lokalizacje_sprzetu_id(id_sprzetu_arg INTEGER, id_nowej_lokacji_sprzetu INTEGER)
+CREATE OR REPLACE FUNCTION zmien_lokacje_sprzetu(id_sprzetu_arg INTEGER, id_nowej_lokacji_sprzetu INTEGER)
 RETURNS TEXT AS $$
 DECLARE
     czy_lokacja_istnieje BOOLEAN;
@@ -553,6 +553,32 @@ create or replace function zmien_dane_pracownika(moje_id_pracownika INTEGER, now
 
 
 
+/* FUNKCJE USUŃ */
+
+
+
+/* usuwanie pracownika */
+create or replace function zwolnij_pracownika(id_pracownika_arg INTEGER)
+returns text as $$
+DECLARE
+	czy_pracownik_istnieje BOOLEAN;
+BEGIN
+	select count(1) > 0 into czy_pracownik_istnieje from pracownicy where id_pracownika = id_pracownika_arg;
+    
+    if not czy_pracownik_istnieje THEN
+    	return 'Nie istnieje pracownik o podanym ID!';
+    end if;
+    
+    /* jezeli istnieje, to go usuwamy z listy pracownikow */
+    delete from pracownicy where id_pracownika = id_pracownika_arg;
+    
+    return 'Pracownik zostal zwolniony.';
+    
+    end;
+    $$ language 'plpgsql';
+
+/* ZWROT*/
+
 /* funkcja do zwracania sprzętu */
 create or replace function zwrot (moje_id_wypozyczenia INTEGER)
 returns text AS $$
@@ -611,28 +637,6 @@ BEGIN
     
  end;
  $$ LANGUAGE 'plpgsql';
-
-
-
-/* usuwanie pracownika */
-create or replace function zwolnij_pracownika(id_pracownika_arg INTEGER)
-returns text as $$
-DECLARE
-	czy_pracownik_istnieje BOOLEAN;
-BEGIN
-	select count(1) > 0 into czy_pracownik_istnieje from pracownicy where id_pracownika = id_pracownika_arg;
-    
-    if not czy_pracownik_istnieje THEN
-    	return 'Nie istnieje pracownik o podanym ID!';
-    end if;
-    
-    /* jezeli istnieje, to go usuwamy z listy pracownikow */
-    delete from pracownicy where id_pracownika = id_pracownika_arg;
-    
-    return 'Pracownik zostal zwolniony.';
-    
-    end;
-    $$ language 'plpgsql';
 
 
 
