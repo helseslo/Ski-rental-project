@@ -197,6 +197,11 @@ ui <- tagList(
               theme = shinytheme("flatly"),
               tabsetPanel(
                 tabPanel("Pełny rejestr", dataTableOutput ('rejestr_lista', width = "70%")),
+                tabPanel("Wypożycz",
+                         selectInput('wypozycz_id_sprzetu', 'Wybierz id sprzętu', choices =c(" ",dbGetQuery(con, "SELECT id_sprzetu FROM sprzet WHERE stan_wypozyczenia=FALSE order by id_sprzetu"))),
+                         selectInput('wypozycz_id_klienta', 'Wybierz id klienta', choices =c(" ",dbGetQuery(con, "SELECT id_klienta FROM klienci ORDER BY id_klienta"))),
+                         dateInput("wypozycz_data_zwrotu","Podaj datę zwrotu", "", format = 'yyyy-mm-dd', min=Sys.Date()),
+                         actionButton("wypozycz","Wypożycz")),
                 
               )
             )
@@ -347,9 +352,20 @@ server <- shinyServer(function(input, output, session){
   })
   
   # rejestr
+  # wypozycz
+  observeEvent(input$wypozycz, {
+    
+    res <- dbSendStatement(con, paste0("select wypozycz(",input$wypozycz_id_sprzetu, ",",
+                                       input$wypozycz_id_klienta, ",", "'",
+                                       input$wypozycz_data_zwrotu,"'",")"))
+    data <- dbFetch(res)
+    updateSelectInput(session, 'wypozycz_id_sprzetu', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_sprzetu FROM sprzet WHERE stan_wypozyczenia=FALSE order by id_sprzetu")), selected = NULL)
+    updateSelectInput(session, 'wypozycz_id_klienta', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_klienta FROM klienci order by id_klienta")), selected = NULL)
+    updateDateInput(session, 'wypozycz_data_zwrotu', min=Sys.Date())
   
-  
-
+    output$rejestr_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM rejestr ORDER BY id_wypozyczenia"))
+    shinyalert(print(data[1,1]), type = "info")
+  })
 })
 
 shinyApp(ui, server, options = list(height = 1080))

@@ -272,7 +272,7 @@ BEGIN
  $$ LANGUAGE 'plpgsql';
 
 
-
+/* FUNKCJE ZMIEŃ*/
 
 /* Funkcja sluzaca do zmiany lokacji sprzetu; uzywana w przypadku, gdy chcemy przeniesc konkrenty sprzet do innej lokalizacji.
 W tej wersji jako argument podajemy id sprzetu, ktorego lokacje chcemy zmienic oraz id tej lokacji.*/
