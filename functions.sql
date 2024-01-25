@@ -209,6 +209,70 @@ $$ LANGUAGE 'plpgsql';
 
 
 
+/* dodaj rejestr */
+create or replace function wypozycz (id_klienta_arg INTEGER, id_sprzetu_arg INTEGER,
+                                    data_zwrotu_arg DATE)
+returns text AS $$
+DECLARE
+		czy_istnieje_klient BOOLEAN;
+    	czy_istnieje_sprzet BOOLEAN;
+    	czy_sprzet_jest_dostepny BOOLEAN;
+        czy_klient_na_czarnej_liscie BOOLEAN;
+        koszt INTEGER;
+        kategoria_sprzetu INTEGER;
+        lokacja_sprzetu INTEGER;
+
+BEGIN
+	
+    
+    SELECT count(1) > 0 INTO czy_istnieje_klient FROM klienci WHERE id_klienta = id_klienta_arg;
+    select count(1) > 0 into czy_istnieje_sprzet from sprzet where id_sprzetu = id_sprzetu_arg;
+    select count(1) > 0 into czy_sprzet_jest_dostepny from sprzet where id_sprzetu = id_sprzetu_arg 
+    								and stan_wypozyczenia = 'f';
+    select count(1) > 0 into czy_klient_na_czarnej_liscie from klienci where id_klienta = id_klienta_arg
+    								and czarna_lista = 't';
+    select id_kategorii into kategoria_sprzetu from sprzet where id_sprzetu = id_sprzetu_arg;
+    select id_lokacji into lokacja_sprzetu from sprzet where id_sprzetu = id_sprzetu_arg;
+    select cena*(data_zwrotu_arg - current_date + 1) into koszt from cennik 
+    where id_kategorii = kategoria_sprzetu and id_lokacji = lokacja_sprzetu;
+    
+     if not czy_istnieje_klient THEN
+    	RETURN 'W bazie nie istnieje klient o podanym ID !';
+    END IF;
+    
+    if not czy_istnieje_sprzet THEN
+    	RETURN 'W bazie nie istnieje sprzet o podanym ID !';
+    END IF;
+    
+    if not czy_sprzet_jest_dostepny THEN
+    	return 'Sprzet o podanym ID jest juz wypozyczony!';
+    end if;
+    
+    if czy_klient_na_czarnej_liscie THEN
+    	return 'Klient jest na czarnej liscie - nie moze wypozyczyc sprzetu.';
+    end if;
+    
+    if (data_zwrotu_arg < (SELECT CURRENT_DATE)) THEN
+    	return 'Data zwrotu nie moze byc wczesniejsza niz obecna data!';
+    end if;
+
+    
+   	/* po sprawdzeniu potrzebnych warunków dodajemy rejestr do tabeli */
+    insert into rejestr(id_klienta, id_sprzetu, data_zwrotu, maksymalne_przedluzenie, podstawowy_koszt, czy_aktualne)
+    values (id_klienta_arg, id_sprzetu_arg, data_zwrotu_arg, data_zwrotu_arg + 7, koszt, 't');
+   
+    
+    /* w tabeli sprzęt musimy zmienić atrybut 'stan_wypozyczenia' dla sprzętu, który został wypozyczony */
+    update sprzet set stan_wypozyczenia = 't'
+    where id_sprzetu = id_sprzetu_arg;
+
+    return 'Wypozyczenie dodane poprawnie!';
+    
+ end;
+ $$ LANGUAGE 'plpgsql';
+
+
+
 
 /* Funkcja sluzaca do zmiany lokacji sprzetu; uzywana w przypadku, gdy chcemy przeniesc konkrenty sprzet do innej lokalizacji.
 W tej wersji jako argument podajemy id sprzetu, ktorego lokacje chcemy zmienic oraz id tej lokacji.*/
