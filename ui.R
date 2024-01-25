@@ -86,14 +86,14 @@ ui <- tagList(
                 tabsetPanel(
                   tabPanel("Przychód w podanym zakresie dat",
                            h3("Sprawdź sumaryczny przychód w podanym zakresie"),
-                           dateInput("przychod_data_od","Data początkowa:", "", format = 'yyyy-mm-dd'),
-                           dateInput("przychod_data_do","Data końcowa:", "", format = 'yyyy-mm-dd', max=Sys.Date()),
+                           dateInput("przychod_data_od","Data początkowa:", ""),
+                           dateInput("przychod_data_do","Data końcowa:", "", max=Sys.Date()),
             
                            actionButton("sprawdz_przychod","Sprawdź przychód")),
                   tabPanel("Przychód dla lokacji w podanym zakresie dat",
                            h3("Sprawdź sumaryczny przychód dla lokacji w podanym zakresie"),
-                           dateInput("przychod_lokacja_data_od","Data początkowa:", "", format = 'yyyy-mm-dd'),
-                           dateInput("przychod_lokacja_data_do","Data końcowa:", "", format = 'yyyy-mm-dd', max=Sys.Date()),
+                           dateInput("przychod_lokacja_data_od","Data początkowa:", ""),
+                           dateInput("przychod_lokacja_data_do","Data końcowa:", "", max=Sys.Date()),
                            selectInput('sprawdz_przychod_id_lokacji', 'Wybierz id lokacji', choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1"))),
                            actionButton("sprawdz_przychod_lokacja","Sprawdź przychód")),
 
@@ -128,7 +128,7 @@ ui <- tagList(
                                    actionButton("zmien_lokacje","Zmień dane lokacji")),
                           # funkcja do usuwania lokacji
                           tabPanel("Usuń lokację",
-                                   selectInput('lokacja_usun_id_lokacji', 'Wybierz id lokacji', choices =c(" ",dbGetQuery(con, "SELECT l1.id_lokacji FROM lokacje AS l1 EXCEPT (SELECT l2.id_lokacji FROM lokacje AS l2 JOIN sprzet USING(id_lokacji) WHERE sprzet.stan_wypozyczenia=TRUE);"))),
+                                   selectInput('lokacja_usun_id_lokacji', 'Wybierz id lokacji', choices =c(" ",dbGetQuery(con, "SELECT l1.id_lokacji FROM lokacje AS l1 EXCEPT (SELECT l2.id_lokacji FROM lokacje AS l2 JOIN sprzet USING(id_lokacji) WHERE sprzet.stan_wypozyczenia=TRUE)"))),
                                    actionButton("usun_lokacje","Usuń lokację")),
                           
                           # widok
@@ -272,6 +272,9 @@ ui <- tagList(
                          textInput("klient_zmiana_pesel","Podaj nowy numer PESEL", value=""),
                          selectInput('klient_zmiana_czarna_lista', 'Wybierz, czy klient ma być na czarnej liście', choices =c(FALSE, TRUE)),
                          actionButton("zmien_klienta","Zmień dane klienta")),
+                tabPanel("Usuń klienta",
+                         selectInput('klient_usun_id_klienta', 'Wybierz id klienta', choices =c(" ",dbGetQuery(con, "SELECT k1.id_klienta FROM klienci AS k1 EXCEPT SELECT r.id_klienta FROM rejestr AS r WHERE czy_aktualne = TRUE"))),
+                         actionButton("usun_klienta","Usuń klienta")),
                 tabPanel("Czarna lista", dataTableOutput('czarna_lista', width="50%")),
                 
               )
@@ -285,7 +288,7 @@ ui <- tagList(
                 tabPanel("Wypożyczenie",
                          selectInput('wypozycz_id_sprzetu', 'Wybierz id sprzętu', choices =c(" ",dbGetQuery(con, "SELECT id_sprzetu FROM sprzet WHERE stan_wypozyczenia=FALSE order by id_sprzetu"))),
                          selectInput('wypozycz_id_klienta', 'Wybierz id klienta', choices =c(" ",dbGetQuery(con, "SELECT id_klienta FROM klienci ORDER BY id_klienta"))),
-                         dateInput("wypozycz_data_zwrotu","Podaj datę zwrotu", "", format = 'yyyy-mm-dd', min=Sys.Date()),
+                         dateInput("wypozycz_data_zwrotu","Podaj datę zwrotu", "",min=Sys.Date()),
                          actionButton("wypozycz","Wypożycz")),
                 tabPanel("Zwrot",
                          selectInput('zwrot_id_wypozyczenia', 'Wybierz id wypozyczenia', choices =c(" ",dbGetQuery(con, "SELECT id_wypozyczenia FROM rejestr WHERE czy_aktualne=TRUE order by id_wypozyczenia"))),
@@ -521,6 +524,15 @@ server <- shinyServer(function(input, output, session){
     output$sprzet_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM sprzet order by 1"))
     shinyalert(print(data[1,1]), type = "info")
   })
+  # usun sprzet
+  observeEvent(input$usun_sprzet, {
+    
+    res <- dbSendStatement(con, paste0("select usun_sprzet(",input$sprzet_usun_id_sprzetu, ")"))
+    data <- dbFetch(res)
+    updateSelectInput(session, 'sprzet_usun_id_sprzetu', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_sprzetu FROM sprzet WHERE stan_wypozyczenia = FALSE order by 1")), selected = NULL)
+    output$sprzet_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM sprzet order by 1"))
+    shinyalert(print(data[1,1]), type = "info")
+  })
   
   # cennik
   # dodaj cennik
@@ -609,6 +621,18 @@ server <- shinyServer(function(input, output, session){
     updateTextInput(session,'klient_zmiana_nr_dowodu', value="")
     updateTextInput(session,'klient_zmiana_pesel', value="")
     updateSelectInput(session, 'klient_zmiana_czarna_lista', label = NULL, choices =c(FALSE,TRUE), selected = NULL)
+    
+    output$czarna_lista_lista = renderDataTable(dbGetQuery(con, "SELECT * FROM czarna_lista ORDER BY id_klienta"))
+    output$klienci_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM klienci ORDER BY id_klienta"))
+    shinyalert(print(data[1,1]), type = "info")
+  })
+  # usuń klienta
+  observeEvent(input$usun_klienta, {
+    
+    res <- dbSendStatement(con, paste0("select usun_klienta(",input$klient_usun_id_klienta, ")"))
+    data <- dbFetch(res)
+    updateSelectInput(session, 'klient_zmiana_id_klienta', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT k1.id_klienta FROM klienci AS k1 EXCEPT SELECT r.id_klienta FROM rejestr AS r WHERE czy_aktualne = TRUE")), selected = NULL)
+
     
     output$czarna_lista_lista = renderDataTable(dbGetQuery(con, "SELECT * FROM czarna_lista ORDER BY id_klienta"))
     output$klienci_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM klienci ORDER BY id_klienta"))
