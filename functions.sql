@@ -863,9 +863,30 @@ BEGIN
 
 
 
-/*---------------------------------------------- WYZWALACZE------------------------------------- */
+/*------------------------------------------------- WYZWALACZE-------------------------------------------------------------- */
 
-/* FUNKCJE SUMARYCZNEGO PRZYCHODU*/
+/*--------------------------- Wyzwalacz after insert rejestr - ustawia poprawnie maksymalne przedłużenie--------------------------------------*/
+create or replace function ustaw_max_przedluzenie()
+returns trigger as $$
+BEGIN
+
+	update rejestr set maksymalne_przedluzenie = data_zwrotu + 7;
+	return null;
+    
+    END;
+$$ LANGUAGE 'plpgsql';
+
+create or replace trigger after_insert_rejestr
+after insert
+on rejestr
+for each row
+execute procedure ustaw_max_przedluzenie();
+
+
+
+
+
+/* ------------------------------------FUNKCJE SUMARYCZNEGO PRZYCHODU-----------------------------------*/
 /* Funkcja wyliczająca sumaryczny przychód; (w podanym zakresie dat, dla podanej lokacji - opcjonalnie)*/
 CREATE OR REPLACE FUNCTION sumaryczny_przychod_zakres_id(data_od DATE, data_do DATE, id_lokacji_arg INTEGER DEFAULT NULL)
 RETURNS TEXT AS $$
