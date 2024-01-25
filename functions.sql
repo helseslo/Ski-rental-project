@@ -19,6 +19,33 @@ execute procedure przenies_do_archiwum();
 
 
 
+create or replace function usun_sprzet (id_sprzetu_arg INTEGER)
+returns text as $$
+DECLARE
+	czy_jest_sprzet BOOLEAN;
+    czy_wypozyczony BOOLEAN;
+BEGIN
+
+	SELECT COUNT(1) > 0 INTO czy_jest_sprzet FROM sprzet where id_sprzetu = id_sprzetu_arg;
+    SELECT count(1) > 0 INTO czy_wypozyczony FROM sprzet 
+    where id_sprzetu = id_sprzetu_arg and stan_wypozyczenia = 't';
+    
+    if not czy_jest_sprzet THEN
+    	return 'Nie istnieje sprzet o podanym ID!';
+    end if;
+    
+    if czy_wypozyczony THEN
+    	return 'Sprzet jest wypozyczony. Nie mozna go usunac.';
+    end if;
+    
+    delete from sprzet where id_sprzetu = id_sprzetu_arg;
+    return 'Usunieto sprzet.';
+    
+    end;
+$$ language 'plpgsql'
+
+
+
 /* FUNKCJE DODAJ */
 
 /* lokacje*/
