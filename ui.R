@@ -84,6 +84,9 @@ ui <- tagList(
               fluidPage(
                 theme = shinytheme("flatly"),
                 tabsetPanel(
+                  tabPanel("Raport codzienny",
+                           h3("Witamy w pracy!"),
+                           actionButton("raport_codzienny","Sprawdź codzienny raport")),
                   tabPanel("Przychód w podanym zakresie dat",
                            h3("Sprawdź sumaryczny przychód w podanym zakresie"),
                            dateInput("przychod_data_od","Data początkowa:", ""),
@@ -96,6 +99,7 @@ ui <- tagList(
                            dateInput("przychod_lokacja_data_do","Data końcowa:", "", max=Sys.Date()),
                            selectInput('sprawdz_przychod_id_lokacji', 'Wybierz id lokacji', choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1"))),
                            actionButton("sprawdz_przychod_lokacja","Sprawdź przychód")),
+                  
 
                   
                 )
@@ -331,6 +335,17 @@ server <- shinyServer(function(input, output, session){
   
   # GUZIKI
   # główna
+  # raport codzienny
+  observeEvent(input$sprawdz_przychod, {
+    
+    res <- dbSendStatement(con, paste0("SELECT sumaryczny_przychod_zakres(","'",input$przychod_data_od,"'", ",", "'",
+                                       input$przychod_data_do,"'",")"))
+    data <- dbFetch(res)
+    updateDateInput(session, 'przychod_data_od', value=NA)
+    updateDateInput(session, 'przychod_data_do', value=NA, max=Sys.Date())
+    shinyalert(print(data[1,1]), type = "info")
+  })
+  
   # sprawdź przychód
   observeEvent(input$sprawdz_przychod, {
     
