@@ -1,0 +1,77 @@
+<diagram program="umletino" version="15.1"><zoom_level>9</zoom_level><help_text>Space for diagram notes</help_text><element><id>UMLClass</id><coordinates><x>192</x><y>350</y><w>234</w><h>99</h></coordinates><panel_attributes>*lokacje*
+--
+*id_lokacji INTEGER
+nazwa_lokacji VARCHAR(50)
+--
+miasto VARCHAR(50)
+ulica VARCHAR(50)
+nr_posesji VARCHAR(50)</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>192</x><y>269</y><w>234</w><h>54</h></coordinates><panel_attributes>*stanowiska*
+--
+*id_stanowiska INTEGER
+nazwa_stanowiska VARCHAR(50)</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>192</x><y>152</y><w>234</w><h>99</h></coordinates><panel_attributes>*pracownicy*
+--
+*id_pracownika INTEGER
+--
+imie VARCHAR(50)
+nazwisko VARCHAR(50)
+id_lokacji INTEGER
+id_stanowiska INTEGER</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>147</x><y>215</y><w>63</w><h>180</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>50;180;10;180;10;10;50;10</additional_attributes></element><element><id>Relation</id><coordinates><x>156</x><y>233</y><w>54</w><h>81</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>40;70;10;70;10;10;40;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>462</x><y>215</y><w>234</w><h>54</h></coordinates><panel_attributes>*kategorie*
+--
+*id_kategorii INTEGER
+nazwa_kategorii VARCHAR(50)
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>462</x><y>278</y><w>234</w><h>117</h></coordinates><panel_attributes>*sprzęt*
+--
+*id_sprzetu INTEGER
+--
+id_kategorii INTEGER
+rozmiar INTEGER
+firma VARCHAR(50)
+stan_wypozyczenia BOOLEAN
+id_lokacji INTEGER
+
+
+
+
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>426</x><y>233</y><w>54</w><h>108</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>40;10;10;10;10;100;40;100</additional_attributes></element><element><id>Relation</id><coordinates><x>417</x><y>368</y><w>63</w><h>27</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;10;50;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>462</x><y>422</y><w>234</w><h>99</h></coordinates><panel_attributes>*cennik*
+--
+ *id_lokacji INTEGER
+ *id_kategorii INTEGER 
+--
+cena DECIMAL(7,2)
+kara DECIMAL(7,2)
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>417</x><y>368</y><w>63</w><h>99</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;10;30;10;30;90;50;90</additional_attributes></element><element><id>Relation</id><coordinates><x>687</x><y>233</y><w>63</w><h>261</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;10;50;10;50;270;10;270</additional_attributes></element><element><id>UMLClass</id><coordinates><x>777</x><y>134</y><w>234</w><h>126</h></coordinates><panel_attributes>*klienci*
+--
+*id_klienta INTEGER
+--
+imie VARCHAR(50)
+nazwisko VARCHAR(50)
+nr_telefonu VARCHAR(9)
+nr_dowodu VARCHAR(8)
+PESEL VARCHAR(11)
+czarna_lista BOOLEAN</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>768</x><y>278</y><w>234</w><h>153</h></coordinates><panel_attributes>*rejestr*
+--
+*id_wypozyczenia INTEGER
+--
+id_klienta INTEGER
+id_sprzetu INTEGER
+data_wypozyczenia DATE
+data_zwrotu DATE
+maksymalne_przedluzenie DATE 
+podstawowy_koszt DECIMAL(7, 2)
+naliczona_kara DECIMAL (7, 2)
+czy_aktualne BOOLEAN
+
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>732</x><y>152</y><w>63</w><h>189</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>50;10;10;10;10;190;40;190</additional_attributes></element><element><id>Relation</id><coordinates><x>687</x><y>296</y><w>99</w><h>63</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;10;30;10;30;50;90;50</additional_attributes></element><element><id>UMLClass</id><coordinates><x>768</x><y>458</y><w>234</w><h>135</h></coordinates><panel_attributes>*rejestr archiwalny*
+--
+*id_wypozyczenia INTEGER
+--
+id_klienta INTEGER
+id_sprzetu INTEGER
+data_wypozyczenia DATE
+data_zwrotu DATE
+maksymalne_przedluzenie DATE 
+podstawowy_koszt DECIMAL(7, 2)
+naliczona_kara DECIMAL (7, 2)
+
+
+</panel_attributes><additional_attributes></additional_attributes></element></diagram>
