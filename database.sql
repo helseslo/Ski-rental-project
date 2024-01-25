@@ -85,6 +85,17 @@ CREATE TABLE rejestr(
     czy_aktualne BOOLEAN DEFAULT (FALSE) NOT NULL
 );
 
+CREATE TABLE rejestr_archiwalny(
+    id_wypozyczenia INTEGER,
+    id_klienta INTEGER,
+    id_sprzetu INTEGER,
+    data_wypozyczenia DATE,
+    data_zwrotu DATE,
+    maksymalne_przedluzenie DATE,
+    podstawowy_koszt DECIMAL(7, 2),
+    naliczona_kara DECIMAL (7, 2)
+);
+
 /* Inserty - lokacje */
 INSERT INTO lokacje (nazwa_lokacji, miasto, ulica, nr_posesji) VALUES ('St. Orczyk', 'Zloty Stok', 'Odjazdowa', 314);
 INSERT INTO lokacje (nazwa_lokacji, miasto, ulica, nr_posesji) VALUES ('Nie na halny', 'Zajezdzone Nowe', 'Portowa', 5432);

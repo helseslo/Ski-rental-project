@@ -146,6 +146,16 @@ ui <- tagList(
                                     selectInput('pracownik_dodanie_id_lokacji', 'Wybierz id lokacji', choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1"))),
                                     selectInput('pracownik_dodanie_id_stanowiska', 'Wybierz id stanowiska', choices =c(" ",dbGetQuery(con, "SELECT id_stanowiska FROM stanowiska order by 1"))),
                                     actionButton("dodaj_pracownika","Dodaj pracownika")),
+                           tabPanel("Zmień dane pracownika",
+                                    selectInput('pracownik_zmiana_id_pracownika', 'Wybierz id pracownika', choices =c(" ",dbGetQuery(con, "SELECT id_pracownika FROM pracownicy order by 1"))),
+                                    textInput("pracownik_zmiana_imie","Podaj nowe imię", value=""),
+                                    textInput("pracownik_zmiana_nazwisko","Podaj nowe nazwisko", value=""),
+                                    selectInput('pracownik_zmiana_id_lokacji', 'Wybierz id nowej lokacji', choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1"))),
+                                    selectInput('pracownik_zmiana_id_stanowiska', 'Wybierz nowe id stanowiska', choices =c(" ",dbGetQuery(con, "SELECT id_stanowiska FROM stanowiska order by 1"))),
+                                    actionButton("zmien_pracownika","Zmień dane pracownika")),
+                           tabPanel("Zwolnij pracownika",
+                                    selectInput('pracownik_usun_id_pracownika', 'Wybierz id pracownika', choices =c(" ",dbGetQuery(con, "SELECT id_pracownika FROM pracownicy order by 1"))),
+                                    actionButton("zwolnij_pracownika","Zwolnij pracownika")),
                            
                          )
               )
@@ -246,6 +256,15 @@ ui <- tagList(
                          textInput('klient_dodanie_nr_dowodu', "Podaj numer dowodu", value=""),
                          textInput('klient_dodanie_pesel', "Podaj numer PESEL", value=""),
                          actionButton("dodaj_klienta","Dodaj klienta")),
+                tabPanel("Zmień dane klienta",
+                         selectInput('klient_zmiana_id_klienta', 'Wybierz id klienta', choices =c(" ",dbGetQuery(con, "SELECT id_klienta FROM klienci order by 1"))),
+                         textInput("klient_zmiana_imie","Podaj nowe imię", value=""),
+                         textInput("klient_zmiana_nazwisko","Podaj nowe nazwisko", value=""),
+                         textInput("klient_zmiana_nr_telefonu","Podaj nowy numer telefonu", value=""),
+                         textInput("klient_zmiana_nr_dowodu","Podaj nowy numer dowodu", value=""),
+                         textInput("klient_zmiana_pesel","Podaj nowy numer PESEL", value=""),
+                         selectInput('klient_zmiana_czarna_lista', 'Wybierz, czy klient ma być na czarnej liście', choices =c(FALSE, TRUE)),
+                         actionButton("zmien_klienta","Zmień dane klienta")),
                 tabPanel("Czarna lista", dataTableOutput('czarna_lista', width="50%")),
                 
               )
@@ -256,11 +275,14 @@ ui <- tagList(
               theme = shinytheme("flatly"),
               tabsetPanel(
                 tabPanel("Pełny rejestr", dataTableOutput ('rejestr_lista', width = "70%")),
-                tabPanel("Wypożycz",
+                tabPanel("Wypożyczenie",
                          selectInput('wypozycz_id_sprzetu', 'Wybierz id sprzętu', choices =c(" ",dbGetQuery(con, "SELECT id_sprzetu FROM sprzet WHERE stan_wypozyczenia=FALSE order by id_sprzetu"))),
                          selectInput('wypozycz_id_klienta', 'Wybierz id klienta', choices =c(" ",dbGetQuery(con, "SELECT id_klienta FROM klienci ORDER BY id_klienta"))),
                          dateInput("wypozycz_data_zwrotu","Podaj datę zwrotu", "", format = 'yyyy-mm-dd', min=Sys.Date()),
                          actionButton("wypozycz","Wypożycz")),
+                tabPanel("Zwrot",
+                         selectInput('zwrot_id_wypozyczenia', 'Wybierz id wypozyczenia', choices =c(" ",dbGetQuery(con, "SELECT id_wypozyczenia FROM rejestr WHERE czy_aktualne=TRUE order by id_wypozyczenia"))),
+                         actionButton("zwrot","Dokonaj zwrotu")),
                 
               )
             )
@@ -376,6 +398,34 @@ server <- shinyServer(function(input, output, session){
     updateTextInput(session,'pracownik_dodanie_nazwisko', value="")
     updateSelectInput(session, 'pracownik_dodanie_id_lokacji', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1")), selected = NULL)
     updateSelectInput(session, 'pracownik_dodanie_id_stanowiska', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_stanowiska FROM stanowiska order by 1")), selected = NULL)
+    output$pracownicy_lista <- renderDataTable( dbGetQuery(con, "SELECT id_pracownika, imie,
+                                                  nazwisko, id_lokacji, id_stanowiska FROM pracownicy order by 1"))
+    shinyalert(print(data[1,1]), type = "info")
+  })
+  # zmien dane pracownika
+  observeEvent(input$zmien_pracownika, {
+    
+    res <- dbSendStatement(con, paste0("select zmien_dane_pracownika(","'",input$pracownik_zmiana_id_pracownika,"'", ",", "'",
+                                       input$pracownik_zmiana_imie,"'", ",", "'",
+                                       input$pracownik_zmiana_nazwisko,"'", ",", "'",
+                                       input$pracownik_zmiana_id_lokacji, "'",",", "'",
+                                       input$pracownik_zmiana_id_stanowiska, "'", ")"))
+    data <- dbFetch(res)
+    updateSelectInput(session, 'pracownik_zmiana_id_pracownika', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_pracownika FROM pracownicy order by 1")), selected = NULL)
+    updateTextInput(session,'pracownik_zmiana_imie', value="")
+    updateTextInput(session,'pracownik_zmiana_nazwisko', value="")
+    updateSelectInput(session, 'pracownik_zmiana_id_lokacji', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1")), selected = NULL)
+    updateSelectInput(session, 'pracownik_zmiana_id_stanowiska', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_stanowiska FROM stanowiska order by 1")), selected = NULL)
+    output$pracownicy_lista <- renderDataTable( dbGetQuery(con, "SELECT id_pracownika, imie,
+                                                  nazwisko, id_lokacji, id_stanowiska FROM pracownicy order by 1"))
+    shinyalert(print(data[1,1]), type = "info")
+  })
+  # zwolnij pracownika
+  observeEvent(input$zwolnij_pracownika, {
+    
+    res <- dbSendStatement(con, paste0("select zwolnij_pracownika(","'",input$pracownik_usun_id_pracownika,"'",")"))
+    data <- dbFetch(res)
+    updateSelectInput(session, 'pracownik_usun_id_pracownika', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_pracownika FROM pracownicy order by 1")), selected = NULL)
     output$pracownicy_lista <- renderDataTable( dbGetQuery(con, "SELECT id_pracownika, imie,
                                                   nazwisko, id_lokacji, id_stanowiska FROM pracownicy order by 1"))
     shinyalert(print(data[1,1]), type = "info")
@@ -522,6 +572,30 @@ server <- shinyServer(function(input, output, session){
     output$klienci_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM klienci ORDER BY id_klienta"))
     shinyalert(print(data[1,1]), type = "info")
   })
+  observeEvent(input$zmien_klienta, {
+    
+    res <- dbSendStatement(con, paste0("select zmien_dane_klienta(",input$klient_zmiana_id_klienta, ",", "'",
+                                       input$klient_zmiana_imie,"'", ",", "'",
+                                       input$klient_zmiana_nazwisko,"'", ",", "'",
+                                       input$klient_zmiana_nr_telefonu,"'", ",", "'",
+                                       input$klient_zmiana_nr_dowodu,"'", ",", "'",
+                                       input$klient_zmiana_pesel,"'", ",", "'",
+                                       input$klient_zmiana_czarna_lista,"'", ")"))
+    data <- dbFetch(res)
+    updateSelectInput(session, 'klient_zmiana_id_klienta', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_klienta FROM klienci order by 1")), selected = NULL)
+    updateTextInput(session,'klient_zmiana_imie', value="")
+    updateTextInput(session,'klient_zmiana_nazwisko', value="")
+    updateTextInput(session,'klient_zmiana_nr_telefonu', value="")
+    updateTextInput(session,'klient_zmiana_nr_dowodu', value="")
+    updateTextInput(session,'klient_zmiana_pesel', value="")
+    updateSelectInput(session, 'klient_zmiana_czarna_lista', label = NULL, choices =c(FALSE,TRUE), selected = NULL)
+    
+    output$klienci_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM klienci ORDER BY id_klienta"))
+    shinyalert(print(data[1,1]), type = "info")
+  })
+  
+
+
   
   # rejestr
   # wypozycz
@@ -535,6 +609,16 @@ server <- shinyServer(function(input, output, session){
     updateSelectInput(session, 'wypozycz_id_sprzetu', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_sprzetu FROM sprzet WHERE stan_wypozyczenia=FALSE order by id_sprzetu")), selected = NULL)
     updateDateInput(session, 'wypozycz_data_zwrotu', value=NA, min=Sys.Date())
   
+    output$rejestr_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM rejestr ORDER BY id_wypozyczenia"))
+    shinyalert(print(data[1,1]), type = "info")
+  })
+  # zwrot
+  observeEvent(input$zwrot, {
+    
+    res <- dbSendStatement(con, paste0("select zwrot(",input$zwrot_id_wypozyczenia,")"))
+    data <- dbFetch(res)
+    updateSelectInput(session, 'zwrot_id_wypozyczenia', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_wypozyczenia FROM rejestr WHERE czy_aktualne=TRUE order by id_wypozyczenia")), selected = NULL)
+
     output$rejestr_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM rejestr ORDER BY id_wypozyczenia"))
     shinyalert(print(data[1,1]), type = "info")
   })
