@@ -865,7 +865,7 @@ BEGIN
 
 /*------------------------------------------------- WYZWALACZE-------------------------------------------------------------- */
 
-/*--------------------------- Wyzwalacz after insert rejestr - ustawia poprawnie maksymalne przedłużenie--------------------------------------*/
+/*--------------------- Wyzwalacz after insert rejestr - ustawia poprawnie maksymalne przedłużenie-------------*/
 create or replace function ustaw_max_przedluzenie()
 returns trigger as $$
 BEGIN
@@ -883,10 +883,31 @@ for each row
 execute procedure ustaw_max_przedluzenie();
 
 
+/*--------------------------Wyzwalacz przenoszący usuwane rejestry do archiwum-------------------------- */
+create or replace function przenies_do_archiwum()
+returns trigger as $$
+BEGIN
+
+	insert into rejestr_archiwalny(id_wypozyczenia, id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu,
+                                   maksymalne_przedluzenie, podstawowy_koszt, naliczona_kara)
+                values(old.id_wypozyczenia, old.id_klienta, old.id_sprzetu, old.data_wypozyczenia, old.data_zwrotu,
+                                   old.maksymalne_przedluzenie, old.podstawowy_koszt, old.naliczona_kara);
+     return old;
+    
+    END;
+$$ LANGUAGE 'plpgsql';
+
+create or replace trigger before_delete_rejestr
+before delete
+on rejestr
+for each row
+execute procedure przenies_do_archiwum();
 
 
 
-/* ------------------------------------FUNKCJE SUMARYCZNEGO PRZYCHODU-----------------------------------*/
+
+
+/* ----------------------------------------------------FUNKCJE SUMARYCZNEGO PRZYCHODU------------------------------------------------------------*/
 /* Funkcja wyliczająca sumaryczny przychód; (w podanym zakresie dat, dla podanej lokacji - opcjonalnie)*/
 CREATE OR REPLACE FUNCTION sumaryczny_przychod_zakres_id(data_od DATE, data_do DATE, id_lokacji_arg INTEGER DEFAULT NULL)
 RETURNS TEXT AS $$
@@ -936,7 +957,7 @@ $$ LANGUAGE 'plpgsql';
 
 
 
-/* Funkcja wyliczająca sumaryczny przychód w podanym zakresie dat;*/
+/*------------------------ Funkcja wyliczająca sumaryczny przychód w podanym zakresie dat;-----------------------------*/
 CREATE OR REPLACE FUNCTION sumaryczny_przychod_zakres(data_od DATE, data_do DATE)
 RETURNS TEXT AS $$
 DECLARE
