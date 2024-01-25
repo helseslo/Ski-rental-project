@@ -146,7 +146,7 @@ INSERT INTO sprzet (id_kategorii, rozmiar, firma, id_lokacji) VALUES (3, 1, 'Glo
 INSERT INTO sprzet (id_kategorii, rozmiar, firma, id_lokacji) VALUES (3, 2, 'Glowa na karku', 2);
 INSERT INTO sprzet (id_kategorii, rozmiar, firma, id_lokacji) VALUES (3, 3, 'Glowa na karku', 2);
 /*buty*/
-INSERT INTO sprzet (id_kategorii, rozmiar, firma, id_lokacji) VALUES (4, 1, 'Buty na luty', 1);
+INSERT INTO sprzet (id_kategorii, rozmiar, firma, stan_wypozyczenia, id_lokacji) VALUES (4, 1, 'Buty na luty', TRUE, 1);
 INSERT INTO sprzet (id_kategorii, rozmiar, firma, id_lokacji) VALUES (4, 2, 'Nie do pary', 1);
 INSERT INTO sprzet (id_kategorii, rozmiar, firma, id_lokacji) VALUES (4, 3, 'Nie do pary', 1);
 INSERT INTO sprzet (id_kategorii, rozmiar, firma, id_lokacji) VALUES (4, 1, 'Buty na luty', 2);

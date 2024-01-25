@@ -740,7 +740,7 @@ BEGIN
     return 'Usunieto sprzet.';
     
     end;
-$$ language 'plpgsql'
+$$ language 'plpgsql';
 
 
 /*------------------------usuń klienta -----------------------------*/

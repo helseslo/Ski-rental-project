@@ -126,6 +126,10 @@ ui <- tagList(
                                    textInput("lokacja_zmiana_ulica","Podaj nową ulicę", value=""),
                                    textInput("lokacja_zmiana_nr","Podaj nowy numer posesji", value=""),
                                    actionButton("zmien_lokacje","Zmień dane lokacji")),
+                          # funkcja do usuwania lokacji
+                          tabPanel("Usuń lokację",
+                                   selectInput('lokacja_usun_id_lokacji', 'Wybierz id lokacji', choices =c(" ",dbGetQuery(con, "SELECT l1.id_lokacji FROM lokacje AS l1 EXCEPT (SELECT l2.id_lokacji FROM lokacje AS l2 JOIN sprzet USING(id_lokacji) WHERE sprzet.stan_wypozyczenia=TRUE);"))),
+                                   actionButton("usun_lokacje","Usuń lokację")),
                           
                           # widok
                           tabPanel("Top lokacje", dataTableOutput('top_lokacje_lista', width="30%")),
@@ -207,6 +211,9 @@ ui <- tagList(
                          selectInput('sprzet_zmiana_id_sprzetu', 'Wybierz id sprzętu', choices =c(" ",dbGetQuery(con, "SELECT id_sprzetu FROM sprzet WHERE stan_wypozyczenia = FALSE order by 1"))),
                          selectInput('sprzet_zmiana_id_lokacji', 'Wybierz id nowej lokacji', choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1"))),
                          actionButton("zmien_sprzet","Zmień lokalizację sprzętu")),
+                tabPanel("Usuń sprzęt",
+                         selectInput('sprzet_usun_id_sprzetu', 'Wybierz id sprzętu', choices =c(" ",dbGetQuery(con, "SELECT id_sprzetu FROM sprzet WHERE stan_wypozyczenia = FALSE order by 1"))),
+                         actionButton("usun_sprzet","Usuń sprzęt")),
                 tabPanel("Top sprzęt", dataTableOutput('top_sprzet_lista', width="40%")),
                 
                 
@@ -384,6 +391,18 @@ server <- shinyServer(function(input, output, session){
     output$top_lokacje_lista = renderDataTable(top_lokacje)
     shinyalert(print(data[1,1]), type = "info")
   })
+  # usun lokację
+  observeEvent(input$usun_lokacje, {
+    
+    res <- dbSendStatement(con, paste0("select usun(",input$lokacja_usun_id_lokacji,")"))
+    data <- dbFetch(res)
+    updateSelectInput(session, 'lokacja_usun_id_lokacji', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1")), selected = NULL)
+    output$lokacje_lista <- renderDataTable( dbGetQuery(con, "SELECT id_lokacji, nazwa_lokacji,
+                                                  miasto, ulica, nr_posesji FROM lokacje order by 1"))
+    output$top_lokacje_lista = renderDataTable(top_lokacje)
+    shinyalert(print(data[1,1]), type = "info")
+  })
+  
   
   # pracownicy
   # dodaj pracownika
