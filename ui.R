@@ -199,6 +199,14 @@ ui <- tagList(
                          textInput("cennik_zmiana_cena","Podaj nową cenę", value=""),
                          textInput("cennik_zmiana_kara","Podaj nową karę", value=""),
                          actionButton("zmien_cennik","Zmień cennik")),
+                tabPanel("Zmień cennik o %",
+                         selectInput('cennik_zmiana_procent_id_lokacji', 'Wybierz id lokacji', choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1"))),
+                         selectInput('cennik_zmiana_procent_id_kategorii', 'Wybierz id kategorii', choices =c(" ",dbGetQuery(con, "SELECT id_kategorii FROM kategorie order by 1"))),
+                         textInput("cennik_zmiana_procent_cena","Podaj procent, o jaki chcesz zmienić cenę 
+                                   (poprzedź go -, jeśli chcesz ją obniżyć)", value=""),
+                         textInput("cennik_zmiana_procent_kara","Podaj procent, o jaki chcesz zmienić karę 
+                                   (poprzedź go -, jeśli chcesz ją obniżyć)", value=""),
+                         actionButton("zmien_cennik_procent","Zmień cennik o procent")),
                 
               )
                 
@@ -402,6 +410,23 @@ server <- shinyServer(function(input, output, session){
     updateSelectInput(session, 'cennik_zmiana_id_lokacji', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1")), selected = NULL)
     
     updateSelectInput(session, 'cennik_zmiana_id_kategorii', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_kategorii FROM kategorie order by 1")), selected = NULL)
+    output$cennik_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM cennik order by 1"))
+    shinyalert(print(data[1,1]), type = "info")
+  })
+  
+  # zmień cennik o %
+  observeEvent(input$zmien_cennik_procent, {
+    
+    res <- dbSendStatement(con, paste0("select zmien_cennik_o_procent(","'",input$cennik_zmiana_procent_cena,"'", ",", "'",
+                                       input$cennik_zmiana_procent_kara,"'", ",", "'",
+                                       input$cennik_zmiana_procent_id_lokacji, "'", ",","'",
+                                       input$cennik_zmiana_procent_id_kategorii,"'", ")"))
+    data <- dbFetch(res)
+    updateTextInput(session,'cennik_zmiana_procent_cena', value="")
+    updateTextInput(session,'cennik_zmiana_procent_kara', value="")
+    updateSelectInput(session, 'cennik_zmiana_procent_id_lokacji', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1")), selected = NULL)
+    
+    updateSelectInput(session, 'cennik_zmiana_procent_id_kategorii', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_kategorii FROM kategorie order by 1")), selected = NULL)
     output$cennik_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM cennik order by 1"))
     shinyalert(print(data[1,1]), type = "info")
   })
