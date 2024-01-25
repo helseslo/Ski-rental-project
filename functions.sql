@@ -18,6 +18,14 @@ BEGIN
 		RETURN 'Nazwa lokacji nie moze przyjmowac wartosci NULL!';
 	END IF;
 
+	IF miasto_arg IS NULL THEN
+		RETURN 'Miasto nie moze przyjmowac wartosci NULL!';
+	END IF;
+
+	IF nr_posesji_arg IS NULL THEN
+		RETURN 'Numer posesji nie moze przyjmowac wartosci NULL!';
+	END IF;
+
 
     INSERT INTO lokacje (nazwa_lokacji, miasto, ulica, nr_posesji) VALUES 
     (nazwa_lokacji_arg, miasto_arg, ulica_arg, nr_posesji_arg);
@@ -39,6 +47,10 @@ BEGIN
 	IF czy_stanowisko_istnieje THEN
         	return 'Istnieje juz stanowisko o podanej nazwie!';
    	 END IF;
+
+	IF nazwa_stanowiska_arg IS NULL THEN
+		RETURN 'Nazwa stanowiska nie moze przyjmowac wartosci NULL!';
+	END IF;
 
 
     INSERT INTO stanowiska (nazwa_stanowiska) VALUES 
