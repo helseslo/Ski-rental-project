@@ -409,7 +409,7 @@ BEGIN
 	SELECT count(1) > 0 INTO czy_istnieje_cena FROM cennik WHERE id_kategorii = moje_id_kategorii 
     								and id_lokacji = moje_id_lokacji;
                                     
-    if procent_ceny < -1 or procent_kary < -1 then
+    if procent_ceny < -100 or procent_kary < -100 then
     	RETURN 'Nie można obniżyć ceny o więcej niż 100 procent!' ;
     end if;
                                                             
@@ -431,10 +431,10 @@ BEGIN
     END IF;
     
     
-    update cennik set cena = (1 + procent_ceny)*cena
+    update cennik set cena = (1 + procent_ceny/100)*cena
     where id_lokacji = moje_id_lokacji AND id_kategorii = moje_id_kategorii;
     
-    update cennik set kara = (1 + procent_kary)*kara
+    update cennik set kara = (1 + procent_kary/100)*kara
     where id_lokacji = moje_id_lokacji AND id_kategorii = moje_id_kategorii;
     
     return 'Cennik zmieniony poprawnie!';
