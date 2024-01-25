@@ -572,6 +572,7 @@ server <- shinyServer(function(input, output, session){
     output$klienci_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM klienci ORDER BY id_klienta"))
     shinyalert(print(data[1,1]), type = "info")
   })
+  # zmień dane klienta
   observeEvent(input$zmien_klienta, {
     
     res <- dbSendStatement(con, paste0("select zmien_dane_klienta(",input$klient_zmiana_id_klienta, ",", "'",
@@ -590,6 +591,7 @@ server <- shinyServer(function(input, output, session){
     updateTextInput(session,'klient_zmiana_pesel', value="")
     updateSelectInput(session, 'klient_zmiana_czarna_lista', label = NULL, choices =c(FALSE,TRUE), selected = NULL)
     
+    output$czarna_lista_lista = renderDataTable(dbGetQuery(con, "SELECT * FROM czarna_lista ORDER BY id_klienta"))
     output$klienci_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM klienci ORDER BY id_klienta"))
     shinyalert(print(data[1,1]), type = "info")
   })
@@ -620,6 +622,7 @@ server <- shinyServer(function(input, output, session){
     updateSelectInput(session, 'zwrot_id_wypozyczenia', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_wypozyczenia FROM rejestr WHERE czy_aktualne=TRUE order by id_wypozyczenia")), selected = NULL)
 
     output$rejestr_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM rejestr ORDER BY id_wypozyczenia"))
+    output$czarna_lista_lista = renderDataTable(dbGetQuery(con, "SELECT * FROM czarna_lista ORDER BY id_klienta"))
     shinyalert(print(data[1,1]), type = "info")
   })
 })
