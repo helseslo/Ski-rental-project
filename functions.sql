@@ -396,39 +396,10 @@ BEGIN
     update cennik set cena = (1 + procent_ceny)*cena
     where id_lokacji = moje_id_lokacji AND id_kategorii = moje_id_kategorii;
     
-    update cennik set naliczona_kara = (1 + procent_kary)*naliczona_kara
+    update cennik set kara = (1 + procent_kary)*kara
     where id_lokacji = moje_id_lokacji AND id_kategorii = moje_id_kategorii;
     
     return 'Cennik zmieniony poprawnie!';
-    
- end;
- $$ LANGUAGE 'plpgsql';
-
-
-
-
-/* Funkcja zmieniająca stanowisko pracownika o podanym id */
-create or replace function zmiana_stanowiska (nowe_id_stanowiska INTEGER, moje_id_pracownika INTEGER)
-returns TEXT as $$
-DECLARE
-	czy_istnieje_stanowisko BOOLEAN;
-    czy_istnieje_pracownik BOOLEAN;
-BEGIN
-	SELECT count(1) > 0 INTO czy_istnieje_stanowisko FROM pracownicy WHERE id_stanowiska = nowe_id_stanowiska;
-    SELECT count(1) > 0 INTO czy_istnieje_pracownik FROM pracownicy WHERE id_pracownika = moje_id_pracownika;
-    
-    IF NOT czy_istnieje_stanowisko THEN
-        RETURN 'Nie istnieje stanowisko o podanym ID :(';
-    END IF;
-
-    IF NOT czy_istnieje_pracownik THEN
-        RETURN 'Nie istnieje pracownik o podanym ID :(';
-    END IF;
-    
-    update pracownicy set id_stanowiska = nowe_id_stanowiska 
-    where id_pracownika = moje_id_pracownika;
-    
-    return 'Stanowisko zmieniono poprawnie!';
     
  end;
  $$ LANGUAGE 'plpgsql';
