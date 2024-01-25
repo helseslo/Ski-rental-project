@@ -81,6 +81,14 @@ BEGIN
     		return 'Nie istnieje stanowisko o podanym ID!';
     	end if;
 
+	IF imie_arg IS NULL THEN
+		RETURN 'Imie nie moze przyjmowac wartosci NULL!';
+	END IF;
+
+	IF nazwisko_arg IS NULL THEN
+		RETURN 'Nazwisko nie moze przyjmowac wartosci NULL!';
+	END IF;
+
 
     	INSERT INTO pracownicy (imie, nazwisko, id_lokacji, id_stanowiska) VALUES 
     	(imie_arg, nazwisko_arg, id_lokacji_arg, id_stanowiska_arg);
@@ -101,6 +109,10 @@ BEGIN
     IF czy_istnieje_kategoria THEN
         RETURN 'Istnieje kategoria o podanej nazwie!';
     END IF;
+
+    IF nazwa_kategorii_arg IS NULL THEN
+		RETURN 'Nazwa kategorii nie moze przyjmowac wartosci NULL!';
+	END IF;
 
 
     INSERT INTO kategorie (nazwa_kategorii) VALUES 
@@ -211,6 +223,11 @@ BEGIN
         	RETURN 'W bazie istnieje juz klient o takim numerze pesel!';
    	 END IF;
 
+	IF (imie_arg IS NULL OR nazwisko_arg IS NULL OR nr_telefonu_arg IS NULL 
+		OR nr_dowodu_arg IS NULL OR pesel_arg IS NULL) THEN
+		RETURN 'Dane klienta nie moga przyjac warosci NULL!';
+	end if;
+
 
     	INSERT INTO klienci (imie, nazwisko, nr_telefonu, nr_dowodu, pesel) VALUES 
     	(imie_arg, nazwisko_arg, nr_telefonu_arg, nr_dowodu_arg, pesel_arg);
@@ -263,6 +280,10 @@ BEGIN
     if czy_klient_na_czarnej_liscie THEN
     	return 'Klient jest na czarnej liście - nie moze wypożyczyć sprzętu.';
     end if;
+
+    IF data_zwrotu_arg IS NULL THEN
+	    RETURN 'Data zwrotu nie moze przyjmowac wartosci NULL!';
+    END IF;
     
     if (data_zwrotu_arg < (SELECT CURRENT_DATE)) THEN
     	return 'Data zwrotu nie może byc wcześniejsza niż obecna data!';
@@ -404,6 +425,10 @@ BEGIN
     	RETURN 'W cenniku nie ma podanej ceny dla wybranej lokacji i kategorii.
         Najpierw dodaj cenę do cennika.';
     END IF;
+
+    if (procent_ceny IS NULL OR procent_kary IS NULL) THEN
+	    RETURN 'Procent, o jaki zmieniamy cene lub kare, nie moze przyjac wartosci NULL!';
+    END IF;
     
     
     update cennik set cena = (1 + procent_ceny)*cena
@@ -465,6 +490,11 @@ $func$;*/
     IF NOT czy_istnieje_klient THEN
         RETURN 'W bazie nie istnieje klient o podanym ID.';
     END IF;
+
+   IF(nowe_imie IS NULL OR nowe_nazwisko IS NULL OR nowy_nr_telefonu IS NULL OR nowy_nr_dowodu IS NULL
+	   OR nowy_pesel IS NULL) THEN
+	   RETURN 'Dane klienta nie moga przyjmowac wartosci NULL!';
+   END IF;
     
    update klienci
    set  imie = nowe_imie
@@ -511,6 +541,10 @@ create or replace function zmien_dane_pracownika(moje_id_pracownika INTEGER, now
     
     IF NOT czy_istnieje_pracownik THEN
         RETURN 'W bazie nie istnieje pracownik o podanym ID.';
+    END IF;
+
+    IF (nowe_imie IS NULL OR nowe_nazwisko IS NULL) THEN
+	    RETURN 'Imie i nazwisko nie moga przyjmowac wartosci NULL!';
     END IF;
     
    update pracownicy
