@@ -354,6 +354,8 @@ BEGIN
 /* Funkcja sluzaca do zmiany lokacji sprzetu; uzywana w przypadku, gdy chcemy przeniesc konkrenty sprzet do innej lokalizacji.
 W tej wersji jako argument podajemy id sprzetu, ktorego lokacje chcemy zmienic oraz id tej lokacji.*/
 
+
+
 CREATE OR REPLACE FUNCTION zmien_lokacje_sprzetu(id_sprzetu_arg INTEGER, id_nowej_lokacji_sprzetu INTEGER)
 RETURNS TEXT AS $$
 DECLARE

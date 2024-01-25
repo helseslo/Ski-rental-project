@@ -176,6 +176,10 @@ ui <- tagList(
                          textInput("sprzet_dodanie_firma","Podaj firmę", value=""),
                          selectInput('sprzet_dodanie_id_lokacji', 'Wybierz id lokacji', choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1"))),
                          actionButton("dodaj_sprzet","Dodaj sprzęt")),
+                tabPanel("Zmień lokalizację sprzętu",
+                         selectInput('sprzet_zmiana_id_sprzetu', 'Wybierz id sprzętu', choices =c(" ",dbGetQuery(con, "SELECT id_sprzetu FROM sprzet WHERE stan_wypozyczenia = FALSE order by 1"))),
+                         selectInput('sprzet_zmiana_id_lokacji', 'Wybierz id nowej lokacji', choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1"))),
+                         actionButton("zmien_sprzet","Zmień lokalizację sprzętu")),
                 tabPanel("Top sprzęt", dataTableOutput('top_sprzet_lista', width="40%")),
                 
                 
@@ -376,6 +380,17 @@ server <- shinyServer(function(input, output, session){
     updateTextInput(session,'sprzet_dodanie_rozmiar', value="")
     updateTextInput(session,'sprzet_dodanie_firma', value="")
     updateSelectInput(session, 'sprzet_dodanie_id_lokacji', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1")), selected = NULL)
+    output$sprzet_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM sprzet order by 1"))
+    shinyalert(print(data[1,1]), type = "info")
+  })
+  # zmien lokalizacje sprzetu
+  observeEvent(input$zmien_sprzet, {
+    
+    res <- dbSendStatement(con, paste0("select zmien_lokacje_sprzetu(","'",input$sprzet_zmiana_id_sprzetu,"'", ",", "'",
+                                       input$sprzet_zmiana_id_lokacji,"'", ")"))
+    data <- dbFetch(res)
+    updateSelectInput(session, 'sprzet_zmiana_id_sprzetu', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_sprzetu FROM sprzet WHERE stan_wypozyczenia = FALSE order by 1")), selected = NULL)
+    updateSelectInput(session, 'sprzet_zmiana_id_lokacji', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1")), selected = NULL)
     output$sprzet_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM sprzet order by 1"))
     shinyalert(print(data[1,1]), type = "info")
   })
