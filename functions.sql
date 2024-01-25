@@ -1,3 +1,24 @@
+/* wyzwalacz :) */
+
+create or replace function przenies_do_archiwum()
+returns trigger as $$
+BEGIN
+	insert into rejestr_archiwalny(id_wypozyczenia, id_klienta, id_sprzetu, data_wypozyczenia,
+                data_zwrotu, maksymalne_przedluzenie, podstawowy_koszt, naliczona_kara)
+                values (OLD.id_wypozyczenia, old.id_klienta, old.id_sprzetu, old.data_wypozyczenia,
+                old.data_zwrotu, old.maksymalne_przedluzenie, old.podstawowy_koszt, old.naliczona_kara);
+                return null;
+    END;
+$$ LANGUAGE 'plpgsql';
+
+create or replace trigger before_delete_rejestr
+before delete
+on rejestr
+for each row
+execute procedure przenies_do_archiwum();
+
+
+
 /* FUNKCJE DODAJ */
 
 /* lokacje*/
