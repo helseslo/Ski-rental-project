@@ -158,6 +158,10 @@ ui <- tagList(
                   tabPanel("Dodaj stanowisko",
                            textInput("stanowisko_dodanie_nazwa","Podaj nazwę", value=""),
                            actionButton("dodaj_stanowisko","Dodaj stanowisko")),
+                  tabPanel("Zmień nazwę stanowiska",
+                           selectInput('stanowisko_zmiana_id_stanowiska', 'Wybierz id stanowiska', choices =c(" ",dbGetQuery(con, "SELECT id_stanowiska FROM stanowiska order by 1"))),
+                           textInput("stanowisko_zmiana_nazwa","Podaj nową nazwę", value=""),
+                           actionButton("zmien_stanowisko","Zmień nazwę stanowiska")),
                   
                 )
               )
@@ -380,6 +384,17 @@ server <- shinyServer(function(input, output, session){
     res <- dbSendStatement(con, paste0("select dodaj_stanowisko(","'",input$stanowisko_dodanie_nazwa,"'", ")"))
     data <- dbFetch(res)
     updateTextInput(session,'stanowisko_dodanie_nazwa', value="")
+    output$stanowiska_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM stanowiska order by 1"))
+    shinyalert(print(data[1,1]), type = "info")
+  })
+  # zmiana
+  observeEvent(input$zmien_stanowisko, {
+    
+    res <- dbSendStatement(con, paste0("select zmien_nazwe_stanowiska(","'",input$stanowisko_zmiana_id_stanowiska,
+                                       "'", ",", "'",input$stanowisko_zmiana_nazwa,"'",")"))
+    data <- dbFetch(res)
+    updateSelectInput(session, 'stanowisko_zmiana_id_stanowiska', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_stanowiska FROM stanowiska order by 1")), selected = NULL)
+    updateTextInput(session,'stanowisko_zmiana_nazwa', value="")
     output$stanowiska_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM stanowiska order by 1"))
     shinyalert(print(data[1,1]), type = "info")
   })
