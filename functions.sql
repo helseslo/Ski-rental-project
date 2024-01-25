@@ -389,6 +389,43 @@ BEGIN
 
 
 
+/* Funkcja zmieniająca nazwę kategorii */
+create or replace function zmien_nazwe_kategorii (id_kategorii_arg INTEGER, nazwa_kategorii_arg VARCHAR(50))
+returns text as $$
+DECLARE
+	czy_jest_kategoria BOOLEAN;
+	czy_juz_jest_nazwa BOOLEAN;
+    
+BEGIN
+
+	SELECT COUNT(1) > 0 INTO czy_jest_kategoria FROM kategorie where id_kategorii = id_kategorii_arg;
+    select count(1) > 0 into czy_juz_jest_nazwa from kategorie where nazwa_kategorii = nazwa_kategorii_arg;
+    
+    if not czy_jest_kategoria THEN
+    	return 'Nie ma kategorii o podanym ID.';
+    end if;
+    
+    if czy_juz_jest_nazwa THEN
+    	return 'Jest juz kategoria o podanej nazwie!';
+    end if;
+    
+    /* sprawdzimy, czy uzytkownik wpisal null */
+    if (nazwa_kategorii_arg is null ) THEN
+    	return 'Nazwa kategorii nie moze przyjac wartosci NULL!';
+    end if;
+    
+    update kategorie set nazwa_kategorii = nazwa_kategorii_arg
+    where id_kategorii = id_kategorii_arg;
+    
+    
+    return 'Edycja zakonczona sukcesem!';
+    
+    end;
+    
+ $$ LANGUAGE 'plpgsql';
+
+
+
 /* Funkcja sluzaca do zmiany lokacji sprzetu; uzywana w przypadku, gdy chcemy przeniesc konkrenty sprzet do innej lokalizacji.
 W tej wersji jako argument podajemy id sprzetu, ktorego lokacje chcemy zmienic oraz id tej lokacji.*/
 
