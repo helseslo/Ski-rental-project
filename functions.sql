@@ -1,52 +1,4 @@
-/* wyzwalacz :) */
-
-create or replace function przenies_do_archiwum()
-returns trigger as $$
-BEGIN
-	insert into rejestr_archiwalny(id_wypozyczenia, id_klienta, id_sprzetu, data_wypozyczenia,
-                data_zwrotu, maksymalne_przedluzenie, podstawowy_koszt, naliczona_kara)
-                values (OLD.id_wypozyczenia, old.id_klienta, old.id_sprzetu, old.data_wypozyczenia,
-                old.data_zwrotu, old.maksymalne_przedluzenie, old.podstawowy_koszt, old.naliczona_kara);
-                return null;
-    END;
-$$ LANGUAGE 'plpgsql';
-
-create or replace trigger before_delete_rejestr
-before delete
-on rejestr
-for each row
-execute procedure przenies_do_archiwum();
-
-
-
-create or replace function usun_sprzet (id_sprzetu_arg INTEGER)
-returns text as $$
-DECLARE
-	czy_jest_sprzet BOOLEAN;
-    czy_wypozyczony BOOLEAN;
-BEGIN
-
-	SELECT COUNT(1) > 0 INTO czy_jest_sprzet FROM sprzet where id_sprzetu = id_sprzetu_arg;
-    SELECT count(1) > 0 INTO czy_wypozyczony FROM sprzet 
-    where id_sprzetu = id_sprzetu_arg and stan_wypozyczenia = 't';
-    
-    if not czy_jest_sprzet THEN
-    	return 'Nie istnieje sprzet o podanym ID!';
-    end if;
-    
-    if czy_wypozyczony THEN
-    	return 'Sprzet jest wypozyczony. Nie mozna go usunac.';
-    end if;
-    
-    delete from sprzet where id_sprzetu = id_sprzetu_arg;
-    return 'Usunieto sprzet.';
-    
-    end;
-$$ language 'plpgsql'
-
-
-
-/* FUNKCJE DODAJ */
+/*--------------------------------------------- FUNKCJE DODAJ----------------------------------------------- */
 
 /* lokacje*/
 CREATE OR REPLACE FUNCTION dodaj_lokacje(nazwa_lokacji_arg VARCHAR(50), miasto_arg VARCHAR(50), ulica_arg VARCHAR(50),nr_posesji_arg VARCHAR(50))
@@ -284,7 +236,7 @@ END;
 $$ LANGUAGE 'plpgsql'; 
 
 
-/* WYPOŻYCZ */
+/*-------------- WYPOŻYCZ-------------- */
 
 /* dodaj rejestr */
 create or replace function wypozycz (id_klienta_arg INTEGER, id_sprzetu_arg INTEGER,
@@ -353,9 +305,9 @@ BEGIN
  $$ LANGUAGE 'plpgsql';
 
 
-/* FUNKCJE ZMIEŃ*/
+/*--------------------------------------------- FUNKCJE ZMIEŃ----------------------------------------------------*/
 
-/* Funkcja zmieniająca dane lokacji */
+/* -----------Funkcja zmieniająca dane lokacji -----------------*/
 create or replace function zmien_dane_lokacji (id_lokacji_arg INTEGER, nazwa_lokacji_arg VARCHAR(50), miasto_arg VARCHAR(50), 
                                                ulica_arg VARCHAR(50), nr_posesji_arg VARCHAR(50))
 returns text as $$
@@ -437,7 +389,7 @@ BEGIN
 
 
 
-/* Funkcja zmieniająca nazwę kategorii */
+/* ---------------Funkcja zmieniająca nazwę kategorii------------------- */
 create or replace function zmien_nazwe_kategorii (id_kategorii_arg INTEGER, nazwa_kategorii_arg VARCHAR(50))
 returns text as $$
 DECLARE
@@ -740,11 +692,11 @@ create or replace function zmien_dane_pracownika(moje_id_pracownika INTEGER, now
 
 
 
-/* FUNKCJE USUŃ */
+/*----------------------------------------------- FUNKCJE USUŃ------------------------------------------------------ */
 
 
 
-/* usuwanie pracownika */
+/* --------------usuwanie pracownika-------------------- */
 create or replace function zwolnij_pracownika(id_pracownika_arg INTEGER)
 returns text as $$
 DECLARE
@@ -764,7 +716,33 @@ BEGIN
     end;
     $$ language 'plpgsql';
 
-/* ZWROT*/
+/*---------------------------usuń sprzet ---------------------*/
+create or replace function usun_sprzet (id_sprzetu_arg INTEGER)
+returns text as $$
+DECLARE
+	czy_jest_sprzet BOOLEAN;
+    czy_wypozyczony BOOLEAN;
+BEGIN
+
+	SELECT COUNT(1) > 0 INTO czy_jest_sprzet FROM sprzet where id_sprzetu = id_sprzetu_arg;
+    SELECT count(1) > 0 INTO czy_wypozyczony FROM sprzet 
+    where id_sprzetu = id_sprzetu_arg and stan_wypozyczenia = 't';
+    
+    if not czy_jest_sprzet THEN
+    	return 'Nie istnieje sprzet o podanym ID!';
+    end if;
+    
+    if czy_wypozyczony THEN
+    	return 'Sprzet jest wypozyczony. Nie mozna go usunac.';
+    end if;
+    
+    delete from sprzet where id_sprzetu = id_sprzetu_arg;
+    return 'Usunieto sprzet.';
+    
+    end;
+$$ language 'plpgsql'
+
+/*----------------------- ZWROT----------------------*/
 
 /* funkcja do zwracania sprzętu */
 create or replace function zwrot (moje_id_wypozyczenia INTEGER)
@@ -827,9 +805,28 @@ BEGIN
 
 
 
-/* WYZWALACZE */
+/*---------------------------------------------- WYZWALACZE------------------------------------- */
 
-/* FUNKCJE SUMARYCZNEGO PRZYCHODU*/
+create or replace function przenies_do_archiwum()
+returns trigger as $$
+BEGIN
+	insert into rejestr_archiwalny(id_wypozyczenia, id_klienta, id_sprzetu, data_wypozyczenia,
+                data_zwrotu, maksymalne_przedluzenie, podstawowy_koszt, naliczona_kara)
+                values (OLD.id_wypozyczenia, old.id_klienta, old.id_sprzetu, old.data_wypozyczenia,
+                old.data_zwrotu, old.maksymalne_przedluzenie, old.podstawowy_koszt, old.naliczona_kara);
+                return old;
+    END;
+$$ LANGUAGE 'plpgsql';
+
+create or replace trigger before_delete_rejestr
+before delete
+on rejestr
+for each row
+execute procedure przenies_do_archiwum();
+
+
+
+/*---------------------------------- FUNKCJE SUMARYCZNEGO PRZYCHODU-------------------------------*/
 /* Funkcja wyliczająca sumaryczny przychód; (w podanym zakresie dat, dla podanej lokacji - opcjonalnie)*/
 CREATE OR REPLACE FUNCTION sumaryczny_przychod_zakres_id(data_od DATE, data_do DATE, id_lokacji_arg INTEGER DEFAULT NULL)
 RETURNS TEXT AS $$
@@ -935,7 +932,7 @@ END;
 $$ LANGUAGE 'plpgsql'; 
 
 
-/*WIDOKI*/
+/*---------------------------------------------------WIDOKI--------------------------------------------*/
 
 /* Widok top lokacje */
 create OR REPLACE view top_lokacje as
