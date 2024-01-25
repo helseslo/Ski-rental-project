@@ -315,6 +315,7 @@ $$ LANGUAGE 'plpgsql';
 
 
 /* Funkcja zmieniająca cenę i karę w cenniku dla podanej lokacji i kategorii */
+
 create or replace function zmien_cennik (nowa_cena DECIMAL(7,2), nowa_kara DECIMAL(7,2),
                                          moje_id_lokacji INTEGER, moje_id_kategorii INTEGER)
 returns TEXT as $$
