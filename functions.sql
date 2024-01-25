@@ -315,7 +315,7 @@ $$ LANGUAGE 'plpgsql';
 
 
 /* Funkcja zmieniająca cenę i karę w cenniku dla podanej lokacji i kategorii */
-create or replace function zmien_cennik (nowa_cena DECIMAL(7,2), nowa_naliczona_kara DECIMAL(7,2),
+create or replace function zmien_cennik (nowa_cena DECIMAL(7,2), nowa_kara DECIMAL(7,2),
                                          moje_id_lokacji INTEGER, moje_id_kategorii INTEGER)
 returns TEXT as $$
 DECLARE
@@ -342,14 +342,14 @@ BEGIN
         return 'W cenniku nie ma ceny dla podanej lokacji i kategorii. Najpierw dodaj cenę do cennika.';
     END IF;
     
-    if (nowa_cena is null or nowa_naliczona_kara is null) THEN
+    if (nowa_cena is null or nowa_kara is null) THEN
     	return 'Cena i kara nie moga przyjmowac wartosci NULL!';
     end if;
     
     update cennik set cena = nowa_cena
     where id_lokacji = moje_id_lokacji AND id_kategorii = moje_id_kategorii;
     
-    update cennik set naliczona_kara = nowa_naliczona_kara
+    update cennik set kara = nowa_kara
     where id_lokacji = moje_id_lokacji AND id_kategorii = moje_id_kategorii;
     
     return 'Cennik zmieniony poprawnie!';

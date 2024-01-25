@@ -193,6 +193,12 @@ ui <- tagList(
                          selectInput('cennik_dodanie_id_lokacji', 'Wybierz id lokacji', choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1"))),
                          selectInput('cennik_dodanie_id_kategorii', 'Wybierz id kategorii', choices =c(" ",dbGetQuery(con, "SELECT id_kategorii FROM kategorie order by 1"))),
                          actionButton("dodaj_cennik","Dodaj cennik")),
+                tabPanel("Zmień cennik",
+                         selectInput('cennik_zmiana_id_lokacji', 'Wybierz id lokacji', choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1"))),
+                         selectInput('cennik_zmiana_id_kategorii', 'Wybierz id kategorii', choices =c(" ",dbGetQuery(con, "SELECT id_kategorii FROM kategorie order by 1"))),
+                         textInput("cennik_zmiana_cena","Podaj nową cenę", value=""),
+                         textInput("cennik_zmiana_kara","Podaj nową karę", value=""),
+                         actionButton("zmien_cennik","Zmień cennik")),
                 
               )
                 
@@ -380,6 +386,22 @@ server <- shinyServer(function(input, output, session){
     updateSelectInput(session, 'cennik_dodanie_id_lokacji', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1")), selected = NULL)
     
     updateSelectInput(session, 'cennik_dodanie_id_kategorii', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_kategorii FROM kategorie order by 1")), selected = NULL)
+    output$cennik_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM cennik order by 1"))
+    shinyalert(print(data[1,1]), type = "info")
+  })
+  # zmień cennik
+  observeEvent(input$zmien_cennik, {
+    
+    res <- dbSendStatement(con, paste0("select zmien_cennik(","'",input$cennik_zmiana_cena,"'", ",", "'",
+                                       input$cennik_zmiana_kara,"'", ",", "'",
+                                       input$cennik_zmiana_id_lokacji, "'", ",","'",
+                                       input$cennik_zmiana_id_kategorii,"'", ")"))
+    data <- dbFetch(res)
+    updateTextInput(session,'cennik_zmiana_cena', value="")
+    updateTextInput(session,'cennik_zmiana_kara', value="")
+    updateSelectInput(session, 'cennik_zmiana_id_lokacji', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1")), selected = NULL)
+    
+    updateSelectInput(session, 'cennik_zmiana_id_kategorii', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_kategorii FROM kategorie order by 1")), selected = NULL)
     output$cennik_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM cennik order by 1"))
     shinyalert(print(data[1,1]), type = "info")
   })
