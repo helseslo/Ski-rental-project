@@ -769,6 +769,37 @@ BEGIN
     end;
 $$ language 'plpgsql';
 
+
+
+/*-----------------------------------usuń lokację--------------------------------------*/
+
+
+create or replace function usun_lokacje (id_lokacji_arg INTEGER)
+returns text as $$
+DECLARE
+	czy_jest_lokacja BOOLEAN;
+    	czy_cos_wypozyczone BOOLEAN;
+BEGIN
+
+	SELECT COUNT(1) > 0 INTO czy_jest_lokacja FROM lokacje where id_lokacji = id_lokacji_arg;
+    	SELECT count(1) > 0 INTO czy_cos_wypozyczone FROM lokacje join sprzet using(id_lokacji)
+    	where id_lokacji = id_lokacji_arg and stan_wypozyczenia = 't';
+    
+	if not czy_jest_lokacja THEN
+	    return 'Nie istnieje lokacja o podanym ID!';
+	end if;
+	    
+	if czy_cos_wypozyczone THEN
+	    return 'W danej lokacji jest nieoddany sprzet. Nie mozna usunac lokacji.';
+	end if;
+	    
+	delete from lokacje where id_lokacji = id_lokacji_arg;
+	return 'Usunieto lokacje.';
+    
+    end;
+$$ language 'plpgsql'
+
+
 /*----------------------- ZWROT----------------------*/
 
 /* funkcja do zwracania sprzętu */
