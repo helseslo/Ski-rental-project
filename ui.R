@@ -34,10 +34,7 @@ rejestr <- dbGetQuery(con, "SELECT * FROM rejestr")
 # Widoki
 top_lokacje <- dbGetQuery(con, "SELECT * FROM top_lokacje")
 top_sprzet <- dbGetQuery(con, "SELECT * FROM top_sprzet")
-narty <- dbGetQuery(con, "SELECT * FROM sprzet WHERE id_kategorii=1")
-kije <- dbGetQuery(con, "SELECT * FROM sprzet WHERE id_kategorii=2")
-kaski <- dbGetQuery(con, "SELECT * FROM sprzet WHERE id_kategorii=3")
-buty <- dbGetQuery(con, "SELECT * FROM sprzet WHERE id_kategorii=4")
+
 
 
 # zaczynamy UI, czyli to, co widać :)
@@ -150,10 +147,6 @@ ui <- tagList(
               theme = shinytheme("flatly"),
               tabsetPanel(
                 tabPanel("Cały sprzęt", dataTableOutput ('sprzet_lista', width="70%")),
-                tabPanel("Narty", dataTableOutput('narty_lista', width="70%")),
-                tabPanel("Kije", dataTableOutput('kije_lista', width="70%")),
-                tabPanel("Kaski", dataTableOutput('kaski_lista', width="70%")),
-                tabPanel("Buty", dataTableOutput('buty_lista', width="70%")),
                 tabPanel("Dodaj sprzęt",
                          selectInput('sprzet_dodanie_id_kategorii', 'Wybierz id kategorii', choices =c(" ",dbGetQuery(con, "SELECT id_kategorii FROM kategorie order by 1"))),
                          textInput("sprzet_dodanie_rozmiar","Podaj rozmiar", value=""),
@@ -188,6 +181,13 @@ ui <- tagList(
               theme = shinytheme("flatly"),
               tabsetPanel(
                 tabPanel("Wszyscy klienci", dataTableOutput ('klienci_lista', width="70%")),
+                tabPanel("Dodaj klienta",
+                         textInput("klient_dodanie_imie","Podaj imię", value=""),
+                         textInput("klient_dodanie_nazwisko","Podaj nazwisko", value=""),
+                         textInput('klient_dodanie_nr_telefonu', "Podaj numer telefonu", value=""),
+                         textInput('klient_dodanie_nr_dowodu', "Podaj numer dowodu", value=""),
+                         textInput('klient_dodanie_pesel', "Podaj numer PESEL", value=""),
+                         actionButton("dodaj_klienta","Dodaj klienta")),
                 
               )
             )
@@ -232,12 +232,6 @@ server <- shinyServer(function(input, output, session){
   output$top_lokacje_lista = renderDataTable(top_lokacje)
   output$top_sprzet_lista = renderDataTable(top_sprzet)
   
-  # Tabele częściowe, ale zbyt mało zaawansowane, żeby to był widok
-  output$narty_lista = renderDataTable(narty)
-  output$kije_lista = renderDataTable(kije)
-  output$kaski_lista = renderDataTable(kaski)
-  output$buty_lista = renderDataTable(buty)
-
   # GUZIKI
   # lokacje
   # dodaj lokacje
@@ -312,10 +306,6 @@ server <- shinyServer(function(input, output, session){
     updateTextInput(session,'sprzet_dodanie_firma', value="")
     updateSelectInput(session, 'sprzet_dodanie_id_lokacji', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1")), selected = NULL)
     output$sprzet_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM sprzet order by 1"))
-    output$kije_lista = renderDataTable(kije)
-    output$kaski_lista = renderDataTable(kaski)
-    output$buty_lista = renderDataTable(buty)
-    output$narty_lista = renderDataTable(narty)
     shinyalert(print(data[1,1]), type = "info")
   })
   
@@ -336,6 +326,27 @@ server <- shinyServer(function(input, output, session){
     output$cennik_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM cennik order by 1"))
     shinyalert(print(data[1,1]), type = "info")
   })
+  
+  # klienci
+  # dodaj klienta
+  observeEvent(input$dodaj_klienta, {
+    
+    res <- dbSendStatement(con, paste0("select dodaj_klienta(","'",input$klient_dodanie_imie,"'", ",", "'",
+                                       input$klient_dodanie_nazwisko,"'", ",", "'",
+                                       input$klient_dodanie_nr_telefonu,"'", ",", "'",
+                                       input$klient_dodanie_nr_dowodu,"'", ",", "'",
+                                       input$klient_dodanie_pesel,"'", ")"))
+    data <- dbFetch(res)
+    updateTextInput(session,'klient_dodanie_imie', value="")
+    updateTextInput(session,'klient_dodanie_nazwisko', value="")
+    updateTextInput(session,'klient_dodanie_nr_telefonu', value="")
+    updateTextInput(session,'klient_dodanie_nr_dowodu', value="")
+    updateTextInput(session,'klient_dodanie_pesel', value="")
+    output$klienci_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM klienci ORDER BY id_klienta"))
+    shinyalert(print(data[1,1]), type = "info")
+  })
+  
+  # rejestr
   
   
 
