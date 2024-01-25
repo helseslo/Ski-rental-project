@@ -794,6 +794,9 @@ BEGIN
 	end if;
 	    
 	delete from lokacje where id_lokacji = id_lokacji_arg;
+    
+    	delete from cennik where id_lokacji = id_lokacji_arg;
+
 	return 'Usunieto lokacje.';
     
     end;
