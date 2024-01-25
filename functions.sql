@@ -815,5 +815,26 @@ BEGIN
 
 
 
+/* usuwanie pracownika */
+create or replace function zwolnij_pracownika(id_pracownika_arg INTEGER)
+returns text as $$
+DECLARE
+	czy_pracownik_istnieje BOOLEAN;
+BEGIN
+	select count(1) > 0 into czy_pracownik_istnieje from pracownicy where id_pracownika = id_pracownika_arg;
+    
+    if not czy_pracownik_istnieje THEN
+    	return 'Nie istnieje pracownik o podanym ID!';
+    end if;
+    
+    /* jezeli istnieje, to go usuwamy z listy pracownikow */
+    delete from pracownicy where id_pracownika = id_pracownika_arg;
+    
+    return 'Pracownik zostal zwolniony.';
+    
+    end;
+    $$ language 'plpgsql';
+
+
 
 /* WYZWALACZE */
