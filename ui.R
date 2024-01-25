@@ -118,6 +118,15 @@ ui <- tagList(
                                    textInput("lokacja_dodanie_nr","Podaj numer posesji", value=""),
                                    actionButton("dodaj_lokacje","Dodaj lokację")),
                           
+                          # funkcja do zmieniania danych lokacji
+                          tabPanel("Zmień dane lokacji",
+                                   selectInput('lokacja_zmiana_id_lokacji', 'Wybierz id lokacji', choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1"))),
+                                   textInput("lokacja_zmiana_nazwa","Podaj nową nazwę lokacji", value=""),
+                                   textInput("lokacja_zmiana_miasto","Podaj nowe miasto", value=""),
+                                   textInput("lokacja_zmiana_ulica","Podaj nową ulicę", value=""),
+                                   textInput("lokacja_zmiana_nr","Podaj nowy numer posesji", value=""),
+                                   actionButton("zmien_lokacje","Zmień dane lokacji")),
+                          
                           # widok
                           tabPanel("Top lokacje", dataTableOutput('top_lokacje_lista', width="30%")),
                           
@@ -314,13 +323,32 @@ server <- shinyServer(function(input, output, session){
   
     res <- dbSendStatement(con, paste0("select dodaj_lokacje(","'",input$lokacja_dodanie_nazwa,"'", ",", "'",
                                        input$lokacja_dodanie_miasto,"'", ",", "'",
-                                       input$lokacja_dodanie_ulica, "'", ",",
-                                       input$lokacja_dodanie_nr, ")"))
+                                       input$lokacja_dodanie_ulica, "'", ",", "'",
+                                       input$lokacja_dodanie_nr, "'", ")"))
     data <- dbFetch(res)
     updateTextInput(session,'lokacja_dodanie_nazwa', value="")
     updateTextInput(session,'lokacja_dodanie_miasto', value="")
     updateTextInput(session,'lokacja_dodanie_ulica', value="")
     updateTextInput(session,'lokacja_dodanie_nr', value="")
+    output$lokacje_lista <- renderDataTable( dbGetQuery(con, "SELECT id_lokacji, nazwa_lokacji,
+                                                  miasto, ulica, nr_posesji FROM lokacje order by 1"))
+    output$top_lokacje_lista = renderDataTable(top_lokacje)
+    shinyalert(print(data[1,1]), type = "info")
+  })
+  # zmien dane lokacji
+  observeEvent(input$zmien_lokacje, {
+    
+    res <- dbSendStatement(con, paste0("select zmien_dane_lokacji(","'",input$lokacja_zmiana_id_lokacji,"'", ",", "'",
+                                       input$lokacja_zmiana_nazwa,"'", ",", "'",
+                                       input$lokacja_zmiana_miasto,"'", ",", "'",
+                                       input$lokacja_zmiana_ulica, "'", ",", "'",
+                                       input$lokacja_zmiana_nr, "'", ")"))
+    data <- dbFetch(res)
+    updateSelectInput(session, 'lokacja_zmiana_id_lokacji', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1")), selected = NULL)
+    updateTextInput(session,'lokacja_zmiana_nazwa', value="")
+    updateTextInput(session,'lokacja_zmiana_miasto', value="")
+    updateTextInput(session,'lokacja_zmiana_ulica', value="")
+    updateTextInput(session,'lokacja_zmiana_nr', value="")
     output$lokacje_lista <- renderDataTable( dbGetQuery(con, "SELECT id_lokacji, nazwa_lokacji,
                                                   miasto, ulica, nr_posesji FROM lokacje order by 1"))
     output$top_lokacje_lista = renderDataTable(top_lokacje)

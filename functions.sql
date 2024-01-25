@@ -1,7 +1,7 @@
 /* FUNKCJE DODAJ */
 
 /* lokacje*/
-CREATE OR REPLACE FUNCTION dodaj_lokacje(nazwa_lokacji_arg VARCHAR(50), miasto_arg VARCHAR(50), ulica_arg VARCHAR(50),nr_posesji_arg INTEGER)
+CREATE OR REPLACE FUNCTION dodaj_lokacje(nazwa_lokacji_arg VARCHAR(50), miasto_arg VARCHAR(50), ulica_arg VARCHAR(50),nr_posesji_arg VARCHAR(50))
 RETURNS TEXT AS $$
 DECLARE
     czy_lokacja_istnieje BOOLEAN;
