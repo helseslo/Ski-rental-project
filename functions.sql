@@ -307,6 +307,50 @@ BEGIN
 
 /* FUNKCJE ZMIEŃ*/
 
+/* Funkcja zmieniająca dane lokacji */
+create or replace function zmien_dane_lokacji (id_lokacji_arg INTEGER, nazwa_lokacji_arg VARCHAR(50), miasto_arg VARCHAR(50), 
+                                               ulica_arg VARCHAR(50), nr_posesji_arg VARCHAR(50))
+returns text as $$
+DECLARE
+	czy_jest_lokacja BOOLEAN;
+	czy_juz_jest_nazwa BOOLEAN;
+    
+BEGIN
+
+	SELECT COUNT(1) > 0 INTO czy_jest_lokacja FROM lokacje where id_lokacji = id_lokacji_arg;
+    select count(1) > 0 into czy_juz_jest_nazwa from lokacje where nazwa_lokacji = nazwa_lokacji_arg;
+    
+    if not czy_jest_lokacja THEN
+    	return 'Nie ma lokacji o podanym ID.';
+    end if;
+    
+    if czy_juz_jest_nazwa THEN
+    	return 'Jest juz lokacja o podanej nazwie!';
+    end if;
+    
+    /* sprawdzimy, czy uzytkownik wpisal null */
+    if (nazwa_lokacji_arg is null or miasto_arg is null or nr_posesji_arg is null) THEN
+    	return 'Nazwa lokacji, miasto i numer posesji nie moga przyjac wartosci NULL!';
+    end if;
+    
+    update lokacje set nazwa_lokacji = nazwa_lokacji_arg
+    where id_lokacji = id_lokacji_arg;
+    
+    update lokacje set miasto = miasto_arg
+    where id_lokacji = id_lokacji_arg;
+    
+    update lokacje set ulica = ulica_arg
+    where id_lokacji = id_lokacji_arg;
+    
+    update lokacje set nr_posesji = nr_posesji_arg
+    where id_lokacji = id_lokacji_arg;
+    
+    return 'Edycja zakonczona sukcesem!';
+    
+    end;
+    
+ $$ LANGUAGE 'plpgsql';
+
 /* Funkcja sluzaca do zmiany lokacji sprzetu; uzywana w przypadku, gdy chcemy przeniesc konkrenty sprzet do innej lokalizacji.
 W tej wersji jako argument podajemy id sprzetu, ktorego lokacje chcemy zmienic oraz id tej lokacji.*/
 
