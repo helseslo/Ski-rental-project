@@ -767,7 +767,7 @@ BEGIN
     return 'Usunieto klienta.';
     
     end;
-$$ language 'plpgsql'
+$$ language 'plpgsql';
 
 /*----------------------- ZWROT----------------------*/
 
@@ -962,3 +962,5 @@ create or replace view klienci_na_czarnej_liscie AS
 select id_klienta, imie, nazwisko, nr_telefonu, nr_dowodu, pesel
 from klienci
 where czarna_lista = 't';
+
+
