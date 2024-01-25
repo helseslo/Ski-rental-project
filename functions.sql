@@ -742,6 +742,33 @@ BEGIN
     end;
 $$ language 'plpgsql'
 
+
+/*------------------------usuń klienta -----------------------------*/
+create or replace function usun_klienta (id_klienta_arg INTEGER)
+returns text as $$
+DECLARE
+	czy_jest_klient BOOLEAN;
+    czy_wszystko_oddal BOOLEAN;
+BEGIN
+
+	SELECT COUNT(1) > 0 INTO czy_jest_klient FROM klienci where id_klienta = id_klienta_arg;
+    SELECT count(1) > 0 INTO czy_wszystko_oddal FROM rejestr 
+    where id_klienta = id_klienta_arg and czy_aktualne = 'f';
+    
+    if not czy_jest_klient THEN
+    	return 'Nie istnieje klient o podanym ID!';
+    end if;
+    
+    if not czy_wszystko_oddal THEN
+    	return 'Klient ma wypozyczony sprzet, zatem nie mozna go usunac.';
+    end if;
+    
+    delete from klienci where id_klienta = id_klienta_arg;
+    return 'Usunieto klienta.';
+    
+    end;
+$$ language 'plpgsql'
+
 /*----------------------- ZWROT----------------------*/
 
 /* funkcja do zwracania sprzętu */
