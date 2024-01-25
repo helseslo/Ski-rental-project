@@ -351,6 +351,44 @@ BEGIN
     
  $$ LANGUAGE 'plpgsql';
 
+
+/* Funkcja zmieniająca nazwę stanowiska */
+create or replace function zmien_nazwe_stanowiska (id_stanowiska_arg INTEGER, nazwa_stanowiska_arg VARCHAR(50))
+returns text as $$
+DECLARE
+	czy_jest_stanowisko BOOLEAN;
+	czy_juz_jest_nazwa BOOLEAN;
+    
+BEGIN
+
+	SELECT COUNT(1) > 0 INTO czy_jest_stanowisko FROM stanowiska where id_stanowiska = id_stanowiska_arg;
+    select count(1) > 0 into czy_juz_jest_nazwa from stanowiska where nazwa_stanowiska = nazwa_stanowiska_arg;
+    
+    if not czy_jest_stanowisko THEN
+    	return 'Nie ma stanowiska o podanym ID.';
+    end if;
+    
+    if czy_juz_jest_nazwa THEN
+    	return 'Jest juz stanowisko o podanej nazwie!';
+    end if;
+    
+    /* sprawdzimy, czy uzytkownik wpisal null */
+    if (nazwa_stanowiska_arg is null ) THEN
+    	return 'Nazwa stanowiska nie moze przyjac wartosci NULL!';
+    end if;
+    
+    update stanowiska set nazwa_stanowiska = nazwa_stanowiska_arg
+    where id_stanowiska = id_stanowiska_arg;
+    
+    
+    return 'Edycja zakonczona sukcesem!';
+    
+    end;
+    
+ $$ LANGUAGE 'plpgsql';
+
+
+
 /* Funkcja sluzaca do zmiany lokacji sprzetu; uzywana w przypadku, gdy chcemy przeniesc konkrenty sprzet do innej lokalizacji.
 W tej wersji jako argument podajemy id sprzetu, ktorego lokacje chcemy zmienic oraz id tej lokacji.*/
 
