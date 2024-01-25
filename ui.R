@@ -174,6 +174,10 @@ ui <- tagList(
                 tabPanel("Dodaj kategorię",
                          textInput("kategoria_dodanie_nazwa","Podaj nazwę", value=""),
                          actionButton("dodaj_kategorie","Dodaj kategorię")),
+                tabPanel("Zmień nazwę kategorii",
+                         selectInput('kategoria_zmiana_id_kategorii', 'Wybierz id kategorii', choices =c(" ",dbGetQuery(con, "SELECT id_kategorii FROM kategorie order by 1"))),
+                         textInput("kategoria_zmiana_nazwa","Podaj nową nazwę", value=""),
+                         actionButton("zmien_kategorie","Zmień nazwę kategorii")),
                 
               )
             )
@@ -387,7 +391,7 @@ server <- shinyServer(function(input, output, session){
     output$stanowiska_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM stanowiska order by 1"))
     shinyalert(print(data[1,1]), type = "info")
   })
-  # zmiana
+  # zmiana nazwy stanowiska
   observeEvent(input$zmien_stanowisko, {
     
     res <- dbSendStatement(con, paste0("select zmien_nazwe_stanowiska(","'",input$stanowisko_zmiana_id_stanowiska,
@@ -406,6 +410,17 @@ server <- shinyServer(function(input, output, session){
     res <- dbSendStatement(con, paste0("select dodaj_kategorie(","'",input$kategoria_dodanie_nazwa,"'", ")"))
     data <- dbFetch(res)
     updateTextInput(session,'kategoria_dodanie_nazwa', value="")
+    output$kategorie_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM kategorie order by 1"))
+    shinyalert(print(data[1,1]), type = "info")
+  })
+  # zmiana nazwy kategorii
+  observeEvent(input$zmien_kategorie, {
+    
+    res <- dbSendStatement(con, paste0("select zmien_nazwe_kategorii(",input$kategoria_zmiana_id_kategorii,
+                                       ",", "'",input$kategoria_zmiana_nazwa,"'",")"))
+    data <- dbFetch(res)
+    updateSelectInput(session, 'kategoria_zmiana_id_kategorii', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_kategorii FROM kategorie order by 1")), selected = NULL)
+    updateTextInput(session,'kategoria_zmiana_nazwa', value="")
     output$kategorie_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM kategorie order by 1"))
     shinyalert(print(data[1,1]), type = "info")
   })
