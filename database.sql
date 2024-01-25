@@ -75,7 +75,7 @@ CREATE TABLE klienci (
 
 CREATE TABLE rejestr(
     id_wypozyczenia INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    id_klienta INTEGER REFERENCES klienci(id_klienta) ON UPDATE CASCADE,
+    id_klienta INTEGER REFERENCES klienci(id_klienta) ON UPDATE CASCADE ON DELETE CASCADE,
     id_sprzetu INTEGER REFERENCES sprzet(id_sprzetu) ON UPDATE CASCADE ON DELETE CASCADE,
     data_wypozyczenia DATE DEFAULT(CURRENT_DATE) NOT NULL,
     data_zwrotu DATE CHECK (data_zwrotu > data_wypozyczenia) NOT NULL,
