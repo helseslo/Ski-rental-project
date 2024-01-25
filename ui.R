@@ -355,12 +355,12 @@ server <- shinyServer(function(input, output, session){
   # wypozycz
   observeEvent(input$wypozycz, {
     
-    res <- dbSendStatement(con, paste0("select wypozycz(",input$wypozycz_id_sprzetu, ",",
-                                       input$wypozycz_id_klienta, ",", "'",
+    res <- dbSendStatement(con, paste0("select wypozycz(",input$wypozycz_id_klienta, ",",
+                                       input$wypozycz_id_sprzetu, ",", "'",
                                        input$wypozycz_data_zwrotu,"'",")"))
     data <- dbFetch(res)
-    updateSelectInput(session, 'wypozycz_id_sprzetu', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_sprzetu FROM sprzet WHERE stan_wypozyczenia=FALSE order by id_sprzetu")), selected = NULL)
     updateSelectInput(session, 'wypozycz_id_klienta', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_klienta FROM klienci order by id_klienta")), selected = NULL)
+    updateSelectInput(session, 'wypozycz_id_sprzetu', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_sprzetu FROM sprzet WHERE stan_wypozyczenia=FALSE order by id_sprzetu")), selected = NULL)
     updateDateInput(session, 'wypozycz_data_zwrotu', min=Sys.Date())
   
     output$rejestr_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM rejestr ORDER BY id_wypozyczenia"))
