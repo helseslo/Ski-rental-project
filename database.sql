@@ -161,13 +161,15 @@ INSERT INTO cennik (cena, kara, id_lokacji, id_kategorii) VALUES (6, 12, 2, 4);
 /* Inserty - klienci */
 INSERT INTO klienci (imie, nazwisko, nr_telefonu, nr_dowodu, PESEL) VALUES ('Jurgen', 'Stokonen', '000000000', '123A', '01119911188');
 INSERT INTO klienci (imie, nazwisko, nr_telefonu, nr_dowodu, PESEL) VALUES ('Anna', 'Wciag-Wyciag', '111111111', '123B', '01010101011');
-INSERT INTO klienci (imie, nazwisko, nr_telefonu, nr_dowodu, PESEL) VALUES ('Tomasz', 'Anartniemasz', '222222222', '123C', '12128801012');
+INSERT INTO klienci (imie, nazwisko, nr_telefonu, nr_dowodu, PESEL) VALUES ('Tomasz', 'Anartniemasz', '222222222', '123C', '92128801012');
+INSERT INTO klienci (imie, nazwisko, nr_telefonu, nr_dowodu, PESEL) VALUES ('Czesław', 'Czarny', '666666666', 'ABC1', '88031388888');
 
 /* Inserty - rejestr */
 INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, podstawowy_koszt) VALUES (1, 1, '2024-01-01', '2024-01-02', 1);
 INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, podstawowy_koszt) VALUES (1, 9, '2024-01-01', '2024-01-02', 1);
 INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, podstawowy_koszt) VALUES (2, 1, '2024-01-03', '2024-01-04', 1);
 INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, podstawowy_koszt) VALUES (2, 9, '2024-01-03', '2024-01-04', 1);
-INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, podstawowy_koszt, naliczona_kara) VALUES (3, 6, '2024-01-01', '2024-01-03', 50, 100);
+INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, podstawowy_koszt, naliczona_kara) VALUES (3, 6, '2024-01-01', '2024-01-05', 100, 200);
 
 INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, podstawowy_koszt, czy_aktualne) VALUES (3, 7, '2024-01-10', '2024-02-03', 50, TRUE);
+INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, podstawowy_koszt, naliczona_kara, czy_aktualne) VALUES (4, 22, '2024-01-10', '2024-01-15', 36, 132, TRUE);

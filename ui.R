@@ -34,6 +34,7 @@ rejestr <- dbGetQuery(con, "SELECT * FROM rejestr")
 # Widoki
 top_lokacje <- dbGetQuery(con, "SELECT * FROM top_lokacje")
 top_sprzet <- dbGetQuery(con, "SELECT * FROM top_sprzet")
+czarna_lista <- dbGetQuery(con, "SELECT * FROM klienci_na_czarnej_liscie")
 
 
 
@@ -188,6 +189,7 @@ ui <- tagList(
                          textInput('klient_dodanie_nr_dowodu', "Podaj numer dowodu", value=""),
                          textInput('klient_dodanie_pesel', "Podaj numer PESEL", value=""),
                          actionButton("dodaj_klienta","Dodaj klienta")),
+                tabPanel("Czarna lista", dataTableOutput('czarna_lista', width="50%")),
                 
               )
             )
@@ -236,6 +238,7 @@ server <- shinyServer(function(input, output, session){
   # Widoki
   output$top_lokacje_lista = renderDataTable(top_lokacje)
   output$top_sprzet_lista = renderDataTable(top_sprzet)
+  output$czarna_lista_lista = renderDataTable(top_sprzet)
   
   # GUZIKI
   # lokacje
