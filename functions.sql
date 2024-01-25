@@ -506,6 +506,13 @@ group by sprzet.id_sprzetu
 order by ilosc_wypozyczen DESC, sprzet.id_sprzetu;
 
 
+/* Widok klienci na czarnej liście */
+create or replace view klienci_na_czarnej_liscie AS
+select id_klienta, imie, nazwisko, nr_telefonu, nr_dowodu, pesel
+from klienci
+where czarna_lista = 't';
+
+
 
 
 /* Funkcja zmieniająca cenę i karę w cenniku dla podanej lokacji i kategorii */
