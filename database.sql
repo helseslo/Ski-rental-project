@@ -83,7 +83,7 @@ CREATE TABLE rejestr(
     maksymalne_przedluzenie DATE DEFAULT('3000-01-01') NOT NULL,
     podstawowy_koszt DECIMAL(7, 2) DEFAULT(0) CHECK (podstawowy_koszt >= 0) NOT NULL,
     naliczona_kara DECIMAL (7, 2) DEFAULT(0) CHECK (naliczona_kara >= 0) NOT NULL,
-    czy_aktualne BOOLEAN DEFAULT (FALSE) NOT NULL
+    czy_aktualne BOOLEAN DEFAULT (TRUE) NOT NULL
 );
 
 CREATE TABLE rejestr_archiwalny(
