@@ -217,6 +217,10 @@ ui <- tagList(
                          textInput("kategoria_zmiana_nazwa","Podaj nową nazwę", value=""),
                          actionButton("zmien_kategorie","Zmień nazwę kategorii"),
                         actionButton("refresh", "Odśwież")),
+                tabPanel("Usuń kategorię",
+                         selectInput('kategoria_usun_id_kategorii', 'Wybierz id kategorii', choices =c(" ",dbGetQuery(con, "SELECT id_kategorii FROM kategorie order by 1"))),
+                         actionButton("usun_kategorie","Usuń kategorię"),
+                         actionButton("refresh", "Odśwież")),
                 
               )
             )
@@ -277,6 +281,11 @@ ui <- tagList(
                                    (poprzedź go -, jeśli chcesz ją obniżyć)", value=""),
                          actionButton("zmien_cennik_procent","Zmień cennik o procent"),
                           actionButton("refresh", "Odśwież")),
+                tabPanel("Usuń cennik",
+                         selectInput('cennik_usun_id_lokacji', 'Wybierz id lokacji', choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1"))),
+                         selectInput('cennik_usun_id_kategorii', 'Wybierz id kategorii', choices =c(" ",dbGetQuery(con, "SELECT id_kategorii FROM kategorie order by 1"))),
+                         actionButton("usun_cennik","Usuń cennik"),
+                         actionButton("refresh", "Odśwież")),
                 
               )
                 
@@ -331,6 +340,10 @@ ui <- tagList(
                          selectInput('zwrot_id_wypozyczenia', 'Wybierz id wypozyczenia', choices =c(" ",dbGetQuery(con, "SELECT id_wypozyczenia FROM rejestr WHERE czy_aktualne=TRUE order by id_wypozyczenia"))),
                          actionButton("zwrot","Dokonaj zwrotu"),
                           actionButton("refresh", "Odśwież")),
+                tabPanel("Usuń wpis",
+                         selectInput('usun_id_wypozyczenia', 'Wybierz id wypozyczenia', choices =c(" ",dbGetQuery(con, "SELECT id_wypozyczenia FROM rejestr order by id_wypozyczenia"))),
+                         actionButton("usun_wpis","Usuń wpis"),
+                         actionButton("refresh", "Odśwież")),
                 
               )
             )
@@ -559,6 +572,15 @@ server <- shinyServer(function(input, output, session){
     output$kategorie_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM kategorie order by 1"))
     shinyalert(print(data[1,1]), type = "info")
   })
+  # usun kategorie
+  observeEvent(input$usun_kategorie, {
+    
+    res <- dbSendStatement(con, paste0("select usun_kategorie(",input$kategoria_usun_id_kategorii,")"))
+    data <- dbFetch(res)
+    updateSelectInput(session, 'kategoria_usun_id_kategorii', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_kategorii FROM kategorie order by 1")), selected = NULL)
+    output$kategorie_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM kategorie order by 1"))
+    shinyalert(print(data[1,1]), type = "info")
+  })
   
   # sprzet
   # dodaj sprzet
@@ -647,6 +669,20 @@ server <- shinyServer(function(input, output, session){
     output$cennik_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM cennik order by 1"))
     shinyalert(print(data[1,1]), type = "info")
   })
+  # usuń cennik
+  # zmień cennik
+  observeEvent(input$usun_cennik, {
+    
+    res <- dbSendStatement(con, paste0("select usun_z_cennika(",
+                                       input$cennik_usun_id_lokacji, ",",
+                                       input$cennik_usun_id_kategorii, ")"))
+    data <- dbFetch(res)
+    updateSelectInput(session, 'cennik_usun_id_lokacji', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1")), selected = NULL)
+  
+    updateSelectInput(session, 'cennik_usun_id_kategorii', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_kategorii FROM kategorie order by 1")), selected = NULL)
+    output$cennik_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM cennik order by 1"))
+    shinyalert(print(data[1,1]), type = "info")
+  })
   
   # klienci
   # dodaj klienta
@@ -727,6 +763,16 @@ server <- shinyServer(function(input, output, session){
     data <- dbFetch(res)
     updateSelectInput(session, 'zwrot_id_wypozyczenia', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_wypozyczenia FROM rejestr WHERE czy_aktualne=TRUE order by id_wypozyczenia")), selected = NULL)
 
+    output$rejestr_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM rejestr ORDER BY id_wypozyczenia"))
+    output$czarna_lista_lista = renderDataTable(dbGetQuery(con, "SELECT * FROM czarna_lista ORDER BY id_klienta"))
+    shinyalert(print(data[1,1]), type = "info")
+  })
+  # usun wpis
+  observeEvent(input$usun_wpis, {
+    
+    res <- dbSendStatement(con, paste0("select usun_z_rejestru(",input$usun_id_wypozyczenia,")"))
+    data <- dbFetch(res)
+    
     output$rejestr_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM rejestr ORDER BY id_wypozyczenia"))
     output$czarna_lista_lista = renderDataTable(dbGetQuery(con, "SELECT * FROM czarna_lista ORDER BY id_klienta"))
     shinyalert(print(data[1,1]), type = "info")
