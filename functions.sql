@@ -898,6 +898,31 @@ BEGIN
 $$ language 'plpgsql';
 
 
+
+/*---------------------------usuń z rejestru--------------------------------*/
+
+create or replace function usun_z_rejestru (id_rejestru_arg INTEGER)
+returns text as $$
+DECLARE
+	czy_jest_rejestr BOOLEAN;
+BEGIN
+
+	SELECT COUNT(1) > 0 INTO czy_jest_rejestr FROM rejestr where id_wypozyczenia = id_rejestru_arg;
+    
+    
+	if not czy_jest_rejestr THEN
+	    return 'Nie istnieje wypożyczenie o podanym ID!';
+	end if;
+	    
+	    
+	delete from rejestr where id_wypozyczenia = id_rejestru_arg;
+    
+	return 'Usunieto wypożyczenie z rejestru.';
+    
+    end;
+$$ language 'plpgsql';
+
+
 /*----------------------- ZWROT----------------------*/
 
 /* funkcja do zwracania sprzętu */
