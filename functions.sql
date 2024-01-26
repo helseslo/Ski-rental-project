@@ -830,6 +830,7 @@ $$ language 'plpgsql';
 
 
 /*---------------------------------------------usuń kategorię---------------------------------------------------------*/
+
 create or replace function usun_kategorie (id_kategorii_arg INTEGER)
 returns text as $$
 DECLARE
@@ -852,6 +853,7 @@ BEGIN
 	    
 	    
 	delete from kategorie where id_kategorii = id_kategorii_arg;
+    delete from cennik where id_kategorii = id_kategorii_arg;
     
 	return 'Usunieto kategorie.';
     
