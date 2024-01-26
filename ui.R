@@ -340,8 +340,7 @@ server <- shinyServer(function(input, output, session){
     
     res <- dbSendStatement(con, paste0("SELECT raport_codzienny()"))
     data <- dbFetch(res)
-    updateDateInput(session, 'przychod_data_od', value=NA)
-    updateDateInput(session, 'przychod_data_do', value=NA, max=Sys.Date())
+    
     shinyalert(print(data[1,1]), type = "info")
   })
   

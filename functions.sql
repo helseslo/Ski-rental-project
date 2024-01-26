@@ -1016,6 +1016,30 @@ END;
 $$ LANGUAGE 'plpgsql'; 
 
 
+/* FUNKCJA RAPORT CODZIENNY */
+
+
+CREATE OR REPLACE FUNCTION raport_codzienny()
+RETURNS TEXT AS $$
+BEGIN
+
+    with t as (
+  -- Any generic query which returns rowid and corresponding calculated values
+    SELECT id_klienta as rowid
+    FROM rejestr JOIN klienci USING(id_klienta) 
+    WHERE(czy_aktualne=TRUE AND maksymalne_przedluzenie < CURRENT_DATE)
+    )
+    update klienci
+    set czarna_lista = TRUE
+    from t
+    where id_klienta = t.rowid;
+
+
+    RETURN 'Raport dzienny wykonany!';
+END; 
+$$ LANGUAGE 'plpgsql';
+
+
 /*---------------------------------------------------WIDOKI--------------------------------------------*/
 
 /* Widok top lokacje */
@@ -1039,4 +1063,9 @@ select id_klienta, imie, nazwisko, nr_telefonu, nr_dowodu, pesel
 from klienci
 where czarna_lista = 't';
 
+/* Widok klienci wiszący sprzęt*/
+create or replace view klienci_przeterminowani AS
+select id_klienta, imie, nazwisko, nr_telefonu, nr_dowodu, pesel
+FROM rejestr JOIN klienci USING(id_klienta) 
+    WHERE(czy_aktualne=TRUE AND maksymalne_przedluzenie < CURRENT_DATE);
 

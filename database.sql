@@ -186,25 +186,3 @@ INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, pod
 INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, maksymalne_przedluzenie, podstawowy_koszt, naliczona_kara, czy_aktualne) VALUES (4, 22, '2024-01-05', '2024-01-10', '2024-01-17', 36, 120, TRUE);
 
 
-/* FUNKCJA RAPORT CODZIENNY */
-
-
-CREATE OR REPLACE FUNCTION raport_codzienny()
-RETURNS TEXT AS $$
-BEGIN
-
-    with t as (
-  -- Any generic query which returns rowid and corresponding calculated values
-    SELECT id_klienta as rowid
-    FROM rejestr JOIN klienci USING(id_klienta) 
-    WHERE(czy_aktualne=TRUE AND maksymalne_przedluzenie < CURRENT_DATE)
-    )
-    update klienci
-    set czarna_lista = TRUE
-    from t
-    where id_klienta = t.rowid;
-
-
-    RETURN 'Raport dzienny wykonany!';
-END; 
-$$ LANGUAGE 'plpgsql';
