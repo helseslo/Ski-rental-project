@@ -696,7 +696,7 @@ create or replace function zmien_dane_pracownika(moje_id_pracownika INTEGER, now
 
 
 
-/* --------------usuwanie pracownika-------------------- */
+/* ----------------------------usuwanie pracownika----------------------------------- */
 create or replace function zwolnij_pracownika(id_pracownika_arg INTEGER)
 returns text as $$
 DECLARE
@@ -716,7 +716,7 @@ BEGIN
     end;
     $$ language 'plpgsql';
 
-/*---------------------------usuń sprzet ---------------------*/
+/*-----------------------------------usuń sprzet -------------------------------------*/
 create or replace function usun_sprzet (id_sprzetu_arg INTEGER)
 returns text as $$
 DECLARE
@@ -743,7 +743,7 @@ BEGIN
 $$ language 'plpgsql';
 
 
-/*------------------------usuń klienta -----------------------------*/
+/*------------------------------------usuń klienta --------------------------------------------*/
 create or replace function usun_klienta (id_klienta_arg INTEGER)
 returns text as $$
 DECLARE
@@ -798,6 +798,32 @@ BEGIN
     	delete from cennik where id_lokacji = id_lokacji_arg;
 
 	return 'Usunieto lokacje.';
+    
+    end;
+$$ language 'plpgsql';
+
+
+
+/*-----------------------------usuń stanowisko -----------------------------------------------*/
+
+create or replace function usun_stanowisko (id_stanowiska_arg INTEGER)
+returns text as $$
+DECLARE
+	czy_jest_stanowisko BOOLEAN;
+    	
+BEGIN
+
+	SELECT COUNT(1) > 0 INTO czy_jest_stanowisko FROM stanowiska where id_stanowiska = id_stanowiska_arg;
+    
+    
+	if not czy_jest_stanowisko THEN
+	    return 'Nie istnieje stanowisko o podanym ID!';
+	end if;
+	    
+	    
+	delete from stanowiska where id_stanowiska = id_stanowiska_arg;
+    
+	return 'Usunieto stanowisko.';
     
     end;
 $$ language 'plpgsql';
