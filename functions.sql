@@ -902,10 +902,11 @@ create or replace function usun_z_rejestru (id_rejestru_arg INTEGER)
 returns text as $$
 DECLARE
 	czy_jest_rejestr BOOLEAN;
+    	id_klienta_arg INTEGER;
 BEGIN
 
 	SELECT COUNT(1) > 0 INTO czy_jest_rejestr FROM rejestr where id_wypozyczenia = id_rejestru_arg;
-    
+    	select id_klienta into id_klienta_arg from rejestr where id_wypozyczenia = id_rejestru_arg;
     
 	if not czy_jest_rejestr THEN
 	    return 'Nie istnieje wypożyczenie o podanym ID!';
@@ -913,6 +914,7 @@ BEGIN
 	    
 	    
 	delete from rejestr where id_wypozyczenia = id_rejestru_arg;
+    	update klienci set czarna_lista='f' where id_klienta = id_klienta_arg;
     
 	return 'Usunieto wypożyczenie z rejestru.';
     
@@ -1001,6 +1003,32 @@ after insert
 on rejestr
 for each row
 execute procedure ustaw_max_przedluzenie();
+
+/*---------------------------------wyzwalacz dodający do czarnej listy po insercie do rejestru i po delecie z rejestru (komentarz)--------------------------------*/
+create or replace function aktualizuj_czarna_liste()
+returns trigger as $$
+BEGIN
+	with t as (
+  -- Any generic query which returns rowid and corresponding calculated values
+    SELECT id_klienta as rowid
+    FROM rejestr JOIN klienci USING(id_klienta) 
+    WHERE(czy_aktualne=TRUE AND maksymalne_przedluzenie < CURRENT_DATE)
+    )
+    update klienci
+    set czarna_lista = TRUE
+    from t
+    where id_klienta = t.rowid;
+    
+	return null;
+    
+    END;
+$$ LANGUAGE 'plpgsql';
+
+create or replace trigger after_insert_delete_rejestr
+after insert or delete
+on rejestr
+for each row
+execute procedure aktualizuj_czarna_liste();
 
 
 /*--------------------------Wyzwalacz przenoszący usuwane rejestry do archiwum-------------------------- */
