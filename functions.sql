@@ -1018,7 +1018,7 @@ BEGIN
     set czarna_lista = TRUE
     from t
     where id_klienta = t.rowid;
-    
+     
 	return null;
     
     END;
