@@ -338,8 +338,7 @@ server <- shinyServer(function(input, output, session){
   # raport codzienny
   observeEvent(input$sprawdz_przychod, {
     
-    res <- dbSendStatement(con, paste0("SELECT sumaryczny_przychod_zakres(","'",input$przychod_data_od,"'", ",", "'",
-                                       input$przychod_data_do,"'",")"))
+    res <- dbSendStatement(con, paste0("SELECT raport_codzienny()"))
     data <- dbFetch(res)
     updateDateInput(session, 'przychod_data_od', value=NA)
     updateDateInput(session, 'przychod_data_do', value=NA, max=Sys.Date())
