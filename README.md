@@ -1,4 +1,2 @@
 # Ski-rental-project
-An ongoing project for a databases course.
-
-We are creating a simple database in postgreSQL and a plain GUI in R Shiny.
+Our project for a database course containing a database in PostgreSQL (including functions, triggers and views) along with a GUI based on R Shiny.
