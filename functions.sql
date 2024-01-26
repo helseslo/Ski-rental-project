@@ -462,9 +462,6 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql'; 
 
-/* wyzwalacz blokujący dodanie nart jako wypozyczonych */
-/* wyzwalacz - nie moze byc 2 takich samych cen dla jednej lokacji i kategorii!!!!*/
-
 
 
 
