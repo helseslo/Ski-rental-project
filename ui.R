@@ -89,19 +89,22 @@ ui <- tagList(
                            h3("Witamy w pracy!"),
                            actionButton("raport_codzienny","Kliknij, jeśli chcesz wykonać codzienny raport i zaktualizować czarną listę"),
                            h3("Stan przeterminowanych wypożyczeń na dziś:"),
-                          dataTableOutput('klienci_przeterminowani_lista', width="70%")),
+                          dataTableOutput('klienci_przeterminowani_lista', width="70%"),
+                          actionButton("refresh", "Odśwież")),
                   tabPanel("Przychód w podanym zakresie dat",
                            h3("Sprawdź sumaryczny przychód w podanym zakresie"),
                            dateInput("przychod_data_od","Data początkowa:", ""),
                            dateInput("przychod_data_do","Data końcowa:", "", max=Sys.Date()),
             
-                           actionButton("sprawdz_przychod","Sprawdź przychód")),
+                           actionButton("sprawdz_przychod","Sprawdź przychód"),
+                            actionButton("refresh", "Odśwież")),
                   tabPanel("Przychód dla lokacji w podanym zakresie dat",
                            h3("Sprawdź sumaryczny przychód dla lokacji w podanym zakresie"),
                            dateInput("przychod_lokacja_data_od","Data początkowa:", ""),
                            dateInput("przychod_lokacja_data_do","Data końcowa:", "", max=Sys.Date()),
                            selectInput('sprawdz_przychod_id_lokacji', 'Wybierz id lokacji', choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1"))),
-                           actionButton("sprawdz_przychod_lokacja","Sprawdź przychód")),
+                           actionButton("sprawdz_przychod_lokacja","Sprawdź przychód"),
+                          actionButton("refresh", "Odśwież")),
                   
 
                   
@@ -123,7 +126,8 @@ ui <- tagList(
                                    textInput("lokacja_dodanie_miasto","Podaj miasto", value=""),
                                    textInput("lokacja_dodanie_ulica","Podaj ulicę", value=""),
                                    textInput("lokacja_dodanie_nr","Podaj numer posesji", value=""),
-                                   actionButton("dodaj_lokacje","Dodaj lokację")),
+                                   actionButton("dodaj_lokacje","Dodaj lokację"),
+                                  actionButton("refresh", "Odśwież")),
                           
                           # funkcja do zmieniania danych lokacji
                           tabPanel("Zmień dane lokacji",
@@ -132,14 +136,17 @@ ui <- tagList(
                                    textInput("lokacja_zmiana_miasto","Podaj nowe miasto", value=""),
                                    textInput("lokacja_zmiana_ulica","Podaj nową ulicę", value=""),
                                    textInput("lokacja_zmiana_nr","Podaj nowy numer posesji", value=""),
-                                   actionButton("zmien_lokacje","Zmień dane lokacji")),
+                                   actionButton("zmien_lokacje","Zmień dane lokacji"),
+                                    actionButton("refresh", "Odśwież")),
                           # funkcja do usuwania lokacji
                           tabPanel("Usuń lokację",
-                                   selectInput('lokacja_usun_id_lokacji', 'Wybierz id lokacji', choices =c(" ",dbGetQuery(con, "SELECT l1.id_lokacji FROM lokacje AS l1 EXCEPT (SELECT l2.id_lokacji FROM lokacje AS l2 JOIN sprzet USING(id_lokacji) WHERE sprzet.stan_wypozyczenia=TRUE)"))),
-                                   actionButton("usun_lokacje","Usuń lokację")),
+                                   selectInput('lokacja_usun_id_lokacji', 'Wybierz id lokacji', choices =c(" ",dbGetQuery(con, "SELECT l1.id_lokacji FROM lokacje AS l1 EXCEPT (SELECT l2.id_lokacji FROM lokacje AS l2 JOIN sprzet USING(id_lokacji) WHERE sprzet.stan_wypozyczenia=TRUE) ORDER BY 1"))),
+                                   actionButton("usun_lokacje","Usuń lokację"),
+                                  actionButton("refresh", "Odśwież")),
                           
                           # widok
-                          tabPanel("Top lokacje", dataTableOutput('top_lokacje_lista', width="30%")),
+                          tabPanel("Top lokacje", dataTableOutput('top_lokacje_lista', width="30%"),
+                          actionButton("refresh", "Odśwież")),
                           
                         )
                     )
@@ -156,17 +163,20 @@ ui <- tagList(
                                     textInput("pracownik_dodanie_nazwisko","Podaj nazwisko", value=""),
                                     selectInput('pracownik_dodanie_id_lokacji', 'Wybierz id lokacji', choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1"))),
                                     selectInput('pracownik_dodanie_id_stanowiska', 'Wybierz id stanowiska', choices =c(" ",dbGetQuery(con, "SELECT id_stanowiska FROM stanowiska order by 1"))),
-                                    actionButton("dodaj_pracownika","Dodaj pracownika")),
+                                    actionButton("dodaj_pracownika","Dodaj pracownika"),
+                                    actionButton("refresh", "Odśwież")),
                            tabPanel("Zmień dane pracownika",
                                     selectInput('pracownik_zmiana_id_pracownika', 'Wybierz id pracownika', choices =c(" ",dbGetQuery(con, "SELECT id_pracownika FROM pracownicy order by 1"))),
                                     textInput("pracownik_zmiana_imie","Podaj nowe imię", value=""),
                                     textInput("pracownik_zmiana_nazwisko","Podaj nowe nazwisko", value=""),
                                     selectInput('pracownik_zmiana_id_lokacji', 'Wybierz id nowej lokacji', choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1"))),
                                     selectInput('pracownik_zmiana_id_stanowiska', 'Wybierz nowe id stanowiska', choices =c(" ",dbGetQuery(con, "SELECT id_stanowiska FROM stanowiska order by 1"))),
-                                    actionButton("zmien_pracownika","Zmień dane pracownika")),
+                                    actionButton("zmien_pracownika","Zmień dane pracownika"),
+                                    actionButton("refresh", "Odśwież")),
                            tabPanel("Zwolnij pracownika",
                                     selectInput('pracownik_usun_id_pracownika', 'Wybierz id pracownika', choices =c(" ",dbGetQuery(con, "SELECT id_pracownika FROM pracownicy order by 1"))),
                                     actionButton("zwolnij_pracownika","Zwolnij pracownika")),
+                                    actionButton("refresh", "Odśwież"),
                            
                          )
               )
@@ -178,11 +188,17 @@ ui <- tagList(
                   tabPanel("Wszystkie stanowiska", dataTableOutput ('stanowiska_lista', width="30%")),
                   tabPanel("Dodaj stanowisko",
                            textInput("stanowisko_dodanie_nazwa","Podaj nazwę", value=""),
-                           actionButton("dodaj_stanowisko","Dodaj stanowisko")),
+                           actionButton("dodaj_stanowisko","Dodaj stanowisko"),
+                            actionButton("refresh", "Odśwież")),
                   tabPanel("Zmień nazwę stanowiska",
                            selectInput('stanowisko_zmiana_id_stanowiska', 'Wybierz id stanowiska', choices =c(" ",dbGetQuery(con, "SELECT id_stanowiska FROM stanowiska order by 1"))),
                            textInput("stanowisko_zmiana_nazwa","Podaj nową nazwę", value=""),
-                           actionButton("zmien_stanowisko","Zmień nazwę stanowiska")),
+                           actionButton("zmien_stanowisko","Zmień nazwę stanowiska"),
+                            actionButton("refresh", "Odśwież")),
+                  tabPanel("Usuń stanowisko",
+                           selectInput('stanowisko_usun_id_stanowiska', 'Wybierz id stanowiska', choices =c(" ",dbGetQuery(con, "SELECT id_stanowiska FROM stanowiska order by 1"))),
+                           actionButton("usun_stanowisko","Usuń stanowisko"),
+                            actionButton("refresh", "Odśwież")),
                   
                 )
               )
@@ -194,11 +210,13 @@ ui <- tagList(
                 tabPanel("Wszystkie kategorie", dataTableOutput ('kategorie_lista', width="30%")),
                 tabPanel("Dodaj kategorię",
                          textInput("kategoria_dodanie_nazwa","Podaj nazwę", value=""),
-                         actionButton("dodaj_kategorie","Dodaj kategorię")),
+                         actionButton("dodaj_kategorie","Dodaj kategorię"),
+                          actionButton("refresh", "Odśwież")),
                 tabPanel("Zmień nazwę kategorii",
                          selectInput('kategoria_zmiana_id_kategorii', 'Wybierz id kategorii', choices =c(" ",dbGetQuery(con, "SELECT id_kategorii FROM kategorie order by 1"))),
                          textInput("kategoria_zmiana_nazwa","Podaj nową nazwę", value=""),
-                         actionButton("zmien_kategorie","Zmień nazwę kategorii")),
+                         actionButton("zmien_kategorie","Zmień nazwę kategorii"),
+                        actionButton("refresh", "Odśwież")),
                 
               )
             )
@@ -213,15 +231,19 @@ ui <- tagList(
                          textInput("sprzet_dodanie_rozmiar","Podaj rozmiar", value=""),
                          textInput("sprzet_dodanie_firma","Podaj firmę", value=""),
                          selectInput('sprzet_dodanie_id_lokacji', 'Wybierz id lokacji', choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1"))),
-                         actionButton("dodaj_sprzet","Dodaj sprzęt")),
+                         actionButton("dodaj_sprzet","Dodaj sprzęt"),
+                          actionButton("refresh", "Odśwież")),
                 tabPanel("Zmień lokalizację sprzętu",
                          selectInput('sprzet_zmiana_id_sprzetu', 'Wybierz id sprzętu', choices =c(" ",dbGetQuery(con, "SELECT id_sprzetu FROM sprzet WHERE stan_wypozyczenia = FALSE order by 1"))),
                          selectInput('sprzet_zmiana_id_lokacji', 'Wybierz id nowej lokacji', choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1"))),
-                         actionButton("zmien_sprzet","Zmień lokalizację sprzętu")),
+                         actionButton("zmien_sprzet","Zmień lokalizację sprzętu"),
+                        actionButton("refresh", "Odśwież")),
                 tabPanel("Usuń sprzęt",
                          selectInput('sprzet_usun_id_sprzetu', 'Wybierz id sprzętu', choices =c(" ",dbGetQuery(con, "SELECT id_sprzetu FROM sprzet WHERE stan_wypozyczenia = FALSE order by 1"))),
-                         actionButton("usun_sprzet","Usuń sprzęt")),
-                tabPanel("Top sprzęt", dataTableOutput('top_sprzet_lista', width="40%")),
+                         actionButton("usun_sprzet","Usuń sprzęt"),
+                          actionButton("refresh", "Odśwież")),
+                tabPanel("Top sprzęt", dataTableOutput('top_sprzet_lista', width="40%"),
+                        actionButton("refresh", "Odśwież")),
                 
                 
               )
@@ -237,13 +259,15 @@ ui <- tagList(
                          textInput("cennik_dodanie_kara","Podaj karę", value=""),
                          selectInput('cennik_dodanie_id_lokacji', 'Wybierz id lokacji', choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1"))),
                          selectInput('cennik_dodanie_id_kategorii', 'Wybierz id kategorii', choices =c(" ",dbGetQuery(con, "SELECT id_kategorii FROM kategorie order by 1"))),
-                         actionButton("dodaj_cennik","Dodaj cennik")),
+                         actionButton("dodaj_cennik","Dodaj cennik"),
+                          actionButton("refresh", "Odśwież")),
                 tabPanel("Zmień cennik",
                          selectInput('cennik_zmiana_id_lokacji', 'Wybierz id lokacji', choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1"))),
                          selectInput('cennik_zmiana_id_kategorii', 'Wybierz id kategorii', choices =c(" ",dbGetQuery(con, "SELECT id_kategorii FROM kategorie order by 1"))),
                          textInput("cennik_zmiana_cena","Podaj nową cenę", value=""),
                          textInput("cennik_zmiana_kara","Podaj nową karę", value=""),
-                         actionButton("zmien_cennik","Zmień cennik")),
+                         actionButton("zmien_cennik","Zmień cennik"),
+                          actionButton("refresh", "Odśwież")),
                 tabPanel("Zmień cennik o %",
                          selectInput('cennik_zmiana_procent_id_lokacji', 'Wybierz id lokacji', choices =c(" ",dbGetQuery(con, "SELECT id_lokacji FROM lokacje order by 1"))),
                          selectInput('cennik_zmiana_procent_id_kategorii', 'Wybierz id kategorii', choices =c(" ",dbGetQuery(con, "SELECT id_kategorii FROM kategorie order by 1"))),
@@ -251,7 +275,8 @@ ui <- tagList(
                                    (poprzedź go -, jeśli chcesz ją obniżyć)", value=""),
                          textInput("cennik_zmiana_procent_kara","Podaj procent, o jaki chcesz zmienić karę 
                                    (poprzedź go -, jeśli chcesz ją obniżyć)", value=""),
-                         actionButton("zmien_cennik_procent","Zmień cennik o procent")),
+                         actionButton("zmien_cennik_procent","Zmień cennik o procent"),
+                          actionButton("refresh", "Odśwież")),
                 
               )
                 
@@ -269,7 +294,8 @@ ui <- tagList(
                          textInput('klient_dodanie_nr_telefonu', "Podaj numer telefonu", value=""),
                          textInput('klient_dodanie_nr_dowodu', "Podaj numer dowodu", value=""),
                          textInput('klient_dodanie_pesel', "Podaj numer PESEL", value=""),
-                         actionButton("dodaj_klienta","Dodaj klienta")),
+                         actionButton("dodaj_klienta","Dodaj klienta"),
+                          actionButton("refresh", "Odśwież")),
                 tabPanel("Zmień dane klienta",
                          selectInput('klient_zmiana_id_klienta', 'Wybierz id klienta', choices =c(" ",dbGetQuery(con, "SELECT id_klienta FROM klienci order by 1"))),
                          textInput("klient_zmiana_imie","Podaj nowe imię", value=""),
@@ -278,11 +304,14 @@ ui <- tagList(
                          textInput("klient_zmiana_nr_dowodu","Podaj nowy numer dowodu", value=""),
                          textInput("klient_zmiana_pesel","Podaj nowy numer PESEL", value=""),
                          selectInput('klient_zmiana_czarna_lista', 'Wybierz, czy klient ma być na czarnej liście', choices =c(FALSE, TRUE)),
-                         actionButton("zmien_klienta","Zmień dane klienta")),
+                         actionButton("zmien_klienta","Zmień dane klienta"),
+                          actionButton("refresh", "Odśwież")),
                 tabPanel("Usuń klienta",
                          selectInput('klient_usun_id_klienta', 'Wybierz id klienta', choices =c(" ",dbGetQuery(con, "SELECT k1.id_klienta FROM klienci AS k1 EXCEPT SELECT r.id_klienta FROM rejestr AS r WHERE czy_aktualne = TRUE"))),
-                         actionButton("usun_klienta","Usuń klienta")),
-                tabPanel("Czarna lista", dataTableOutput('czarna_lista_lista', width="50%")),
+                         actionButton("usun_klienta","Usuń klienta"),
+                        actionButton("refresh", "Odśwież")),
+                tabPanel("Czarna lista", dataTableOutput('czarna_lista_lista', width="50%"),
+                      actionButton("refresh", "Odśwież")),
                 
               )
             )
@@ -296,10 +325,12 @@ ui <- tagList(
                          selectInput('wypozycz_id_sprzetu', 'Wybierz id sprzętu', choices =c(" ",dbGetQuery(con, "SELECT id_sprzetu FROM sprzet WHERE stan_wypozyczenia=FALSE order by id_sprzetu"))),
                          selectInput('wypozycz_id_klienta', 'Wybierz id klienta', choices =c(" ",dbGetQuery(con, "SELECT id_klienta FROM klienci ORDER BY id_klienta"))),
                          dateInput("wypozycz_data_zwrotu","Podaj datę zwrotu", "",min=Sys.Date()),
-                         actionButton("wypozycz","Wypożycz")),
+                         actionButton("wypozycz","Wypożycz"),
+                        actionButton("refresh", "Odśwież")),
                 tabPanel("Zwrot",
                          selectInput('zwrot_id_wypozyczenia', 'Wybierz id wypozyczenia', choices =c(" ",dbGetQuery(con, "SELECT id_wypozyczenia FROM rejestr WHERE czy_aktualne=TRUE order by id_wypozyczenia"))),
-                         actionButton("zwrot","Dokonaj zwrotu")),
+                         actionButton("zwrot","Dokonaj zwrotu"),
+                          actionButton("refresh", "Odśwież")),
                 
               )
             )
@@ -339,6 +370,10 @@ server <- shinyServer(function(input, output, session){
   
   
   # GUZIKI
+  # refresh
+  observeEvent(input$refresh, {
+    refresh()
+  })
   # główna
   # raport codzienny
   observeEvent(input$raport_codzienny, {
@@ -490,6 +525,15 @@ server <- shinyServer(function(input, output, session){
     data <- dbFetch(res)
     updateSelectInput(session, 'stanowisko_zmiana_id_stanowiska', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_stanowiska FROM stanowiska order by 1")), selected = NULL)
     updateTextInput(session,'stanowisko_zmiana_nazwa', value="")
+    output$stanowiska_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM stanowiska order by 1"))
+    shinyalert(print(data[1,1]), type = "info")
+  })
+  # usun stanowisko
+  observeEvent(input$usun_stanowisko, {
+    
+    res <- dbSendStatement(con, paste0("select usun_stanowisko(",input$stanowisko_usun_id_stanowiska,")"))
+    data <- dbFetch(res)
+    updateSelectInput(session, 'stanowisko_usun_id_stanowiska', label = NULL, choices =c(" ",dbGetQuery(con, "SELECT id_stanowiska FROM stanowiska order by 1")), selected = NULL)
     output$stanowiska_lista <- renderDataTable( dbGetQuery(con, "SELECT * FROM stanowiska order by 1"))
     shinyalert(print(data[1,1]), type = "info")
   })
