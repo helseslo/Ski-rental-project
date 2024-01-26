@@ -861,6 +861,43 @@ BEGIN
 $$ language 'plpgsql';
 
 
+/*---------------------------------------------usuń z cennika-------------------------------------------*/
+
+create or replace function usun_z_cennika (id_lokacji_arg INTEGER, id_kategorii_arg INTEGER)
+returns text as $$
+DECLARE
+	czy_jest_kategoria BOOLEAN;
+    	czy_jest_lokacja BOOLEAN;
+    	czy_jest_cena_w_cenniku BOOLEAN;
+BEGIN
+
+	SELECT COUNT(1) > 0 INTO czy_jest_kategoria FROM kategorie where id_kategorii = id_kategorii_arg;
+	select count(1) > 0 into czy_jest_lokacja from lokacje where id_lokacji = id_lokacji_arg;
+	select count(1) > 0 into czy_jest_cena_w_cenniku from cennik 
+	where id_lokacji = id_lokacji_arg and id_kategorii = id_kategorii_arg;
+    
+    
+	if not czy_jest_kategoria THEN
+	    return 'Nie istnieje kategoria o podanym ID!';
+	end if;
+    
+   	if not czy_jest_lokacja THEN
+   	     return 'Nie istnieje lokacja o podanym ID!';
+   	 end if;
+    
+    	 if not czy_jest_cena_w_cenniku THEN
+   	     return 'Nie istnieje wpis w cenniku dla lokacji i kategorii o podanych ID!';
+    	end if;
+	    
+	    
+	delete from cennik where id_kategorii = id_kategorii_arg and id_lokacji = id_lokacji_arg;
+    
+	return 'Usunieto wpis z cennika.';
+    
+    end;
+$$ language 'plpgsql';
+
+
 /*----------------------- ZWROT----------------------*/
 
 /* funkcja do zwracania sprzętu */
