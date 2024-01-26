@@ -1035,7 +1035,7 @@ BEGIN
     where id_klienta = t.rowid;
 
 
-    RETURN 'Raport dzienny wykonany!';
+    RETURN 'Raport dzienny wykonany, czarna lista zaktualizowana!';
 END; 
 $$ LANGUAGE 'plpgsql';
 
@@ -1065,7 +1065,7 @@ where czarna_lista = 't';
 
 /* Widok klienci wiszący sprzęt*/
 create or replace view klienci_przeterminowani AS
-select id_klienta, imie, nazwisko, nr_telefonu, nr_dowodu, pesel
+select id_wypozyczenia, id_sprzetu, id_klienta, imie, nazwisko, nr_telefonu, nr_dowodu, pesel
 FROM rejestr JOIN klienci USING(id_klienta) 
     WHERE(czy_aktualne=TRUE AND maksymalne_przedluzenie < CURRENT_DATE);
 

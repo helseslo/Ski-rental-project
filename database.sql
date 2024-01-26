@@ -8,6 +8,7 @@ DROP TABLE sprzet CASCADE;
 DROP TABLE cennik CASCADE;
 DROP TABLE klienci CASCADE;
 DROP TABLE rejestr CASCADE;
+DROP TABLE rejestr_archiwalny CASCADE;
 
 /* Tworzenie tabel */
 
@@ -174,7 +175,9 @@ INSERT INTO klienci (imie, nazwisko, nr_telefonu, nr_dowodu, PESEL) VALUES ('Jur
 INSERT INTO klienci (imie, nazwisko, nr_telefonu, nr_dowodu, PESEL) VALUES ('Anna', 'Wciag-Wyciag', '111111111', '123B', '01010101011');
 INSERT INTO klienci (imie, nazwisko, nr_telefonu, nr_dowodu, PESEL) VALUES ('Tomasz', 'Anartniemasz', '222222222', '123C', '92128801012');
 INSERT INTO klienci (imie, nazwisko, nr_telefonu, nr_dowodu, PESEL) VALUES ('Czesław', 'Czarny', '666666666', 'ABC1', '88031388888');
-
+INSERT INTO klienci (imie, nazwisko, nr_telefonu, nr_dowodu, PESEL) VALUES ('Czesława', 'Czarna', '666666661', 'ABC2', '88031388881');
+INSERT INTO klienci (imie, nazwisko, nr_telefonu, nr_dowodu, PESEL, czarna_lista) VALUES ('Jack', 'Black', '666666662', 'ABC4', '88031388884', TRUE);
+INSERT INTO klienci (imie, nazwisko, nr_telefonu, nr_dowodu, PESEL) VALUES ('Norbert', 'Spóźnialski', '123123333', 'ABC5', '88031388867');
 /* Inserty - rejestr */
 INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, podstawowy_koszt) VALUES (1, 1, '2024-01-01', '2024-01-02', 1);
 INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, podstawowy_koszt) VALUES (1, 9, '2024-01-01', '2024-01-02', 1);
@@ -185,4 +188,6 @@ INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, pod
 INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, podstawowy_koszt, czy_aktualne) VALUES (3, 7, '2024-01-10', '2024-02-03', 50, TRUE);
 INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, maksymalne_przedluzenie, podstawowy_koszt, naliczona_kara, czy_aktualne) VALUES (4, 22, '2024-01-05', '2024-01-10', '2024-01-17', 36, 120, TRUE);
 
-
+INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, maksymalne_przedluzenie, podstawowy_koszt, naliczona_kara, czy_aktualne) VALUES (5, 24, '2024-01-05', '2024-01-10', '2024-01-17', 36, 120, TRUE);
+INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, maksymalne_przedluzenie, podstawowy_koszt, naliczona_kara, czy_aktualne) VALUES (7, 25, '2024-01-05', '2024-01-10', '2024-01-17', 36, 120, TRUE);
+INSERT INTO rejestr (id_klienta, id_sprzetu, data_wypozyczenia, data_zwrotu, maksymalne_przedluzenie, podstawowy_koszt, naliczona_kara, czy_aktualne) VALUES (6, 25, '2023-01-05', '2023-01-10', '2023-01-17', 36, 120, FALSE);

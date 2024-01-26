@@ -35,6 +35,7 @@ rejestr <- dbGetQuery(con, "SELECT * FROM rejestr")
 top_lokacje <- dbGetQuery(con, "SELECT * FROM top_lokacje")
 top_sprzet <- dbGetQuery(con, "SELECT * FROM top_sprzet")
 czarna_lista <- dbGetQuery(con, "SELECT * FROM klienci_na_czarnej_liscie")
+klienci_przeterminowani <- dbGetQuery(con, "SELECT * FROM klienci_przeterminowani")
 
 
 
@@ -86,7 +87,9 @@ ui <- tagList(
                 tabsetPanel(
                   tabPanel("Raport codzienny",
                            h3("Witamy w pracy!"),
-                           actionButton("raport_codzienny","Sprawdź codzienny raport")),
+                           actionButton("raport_codzienny","Kliknij, jeśli chcesz wykonać codzienny raport i zaktualizować czarną listę"),
+                           h3("Stan przeterminowanych wypożyczeń na dziś:"),
+                          dataTableOutput('klienci_przeterminowani_lista', width="70%")),
                   tabPanel("Przychód w podanym zakresie dat",
                            h3("Sprawdź sumaryczny przychód w podanym zakresie"),
                            dateInput("przychod_data_od","Data początkowa:", ""),
@@ -279,7 +282,7 @@ ui <- tagList(
                 tabPanel("Usuń klienta",
                          selectInput('klient_usun_id_klienta', 'Wybierz id klienta', choices =c(" ",dbGetQuery(con, "SELECT k1.id_klienta FROM klienci AS k1 EXCEPT SELECT r.id_klienta FROM rejestr AS r WHERE czy_aktualne = TRUE"))),
                          actionButton("usun_klienta","Usuń klienta")),
-                tabPanel("Czarna lista", dataTableOutput('czarna_lista', width="50%")),
+                tabPanel("Czarna lista", dataTableOutput('czarna_lista_lista', width="50%")),
                 
               )
             )
@@ -331,17 +334,20 @@ server <- shinyServer(function(input, output, session){
   # Widoki
   output$top_lokacje_lista = renderDataTable(top_lokacje)
   output$top_sprzet_lista = renderDataTable(top_sprzet)
-  output$czarna_lista_lista = renderDataTable(top_sprzet)
+  output$czarna_lista_lista = renderDataTable(czarna_lista)
+  output$klienci_przeterminowani_lista = renderDataTable(klienci_przeterminowani)
+  
   
   # GUZIKI
   # główna
   # raport codzienny
-  observeEvent(input$sprawdz_przychod, {
+  observeEvent(input$raport_codzienny, {
     
     res <- dbSendStatement(con, paste0("SELECT raport_codzienny()"))
     data <- dbFetch(res)
-    
     shinyalert(print(data[1,1]), type = "info")
+    output$klienci_przeterminowani_lista = renderDataTable(klienci_przeterminowani)
+    output$czarna_lista_lista = renderDataTable(top_sprzet)
   })
   
   # sprawdź przychód
