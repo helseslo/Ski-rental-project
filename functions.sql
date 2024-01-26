@@ -829,6 +829,36 @@ BEGIN
 $$ language 'plpgsql';
 
 
+/*---------------------------------------------usuń kategorię---------------------------------------------------------*/
+create or replace function usun_kategorie (id_kategorii_arg INTEGER)
+returns text as $$
+DECLARE
+	czy_jest_kategoria BOOLEAN;
+    czy_sprzety_nieoddane BOOLEAN;
+BEGIN
+
+	SELECT COUNT(1) > 0 INTO czy_jest_kategoria FROM kategorie where id_kategorii = id_kategorii_arg;
+    select count(1) > 0 into czy_sprzety_nieoddane from sprzet 
+    where id_kategorii = id_kategorii_arg and stan_wypozyczenia = 't';
+    
+    
+	if not czy_jest_kategoria THEN
+	    return 'Nie istnieje kategoria o podanym ID!';
+	end if;
+    
+    if czy_sprzety_nieoddane THEN
+    	return 'Istnieje nieoddany sprzet w tej kategorii. Nie mozna usunac kategorii.';
+    end if;
+	    
+	    
+	delete from kategorie where id_kategorii = id_kategorii_arg;
+    
+	return 'Usunieto kategorie.';
+    
+    end;
+$$ language 'plpgsql';
+
+
 /*----------------------- ZWROT----------------------*/
 
 /* funkcja do zwracania sprzętu */
